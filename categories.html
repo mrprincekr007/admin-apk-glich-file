@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CATEGORIES - ADMIN PANEL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        *,
+        *::before,
+        *::after {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        :focus { outline: none; }
+
+        :root {
+            --bg: #0a0f1e;
+            --panel: #111827;
+            --panel-2: #1a2234;
+            --border: rgba(99, 102, 241, 0.18);
+            --accent: #6366f1;
+            --accent-2: #ec4899;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --green: #10b981;
+            --red: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px 18px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+        }
+
+        .sidebar .logo .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sidebar .logo .name {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .sidebar .logo .role {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            user-select: none;
+        }
+
+        .nav-item:hover { background: var(--panel-2); color: var(--text); }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));
+            color: #fff;
+            border: 1px solid var(--border);
+        }
+
+        .nav-item .ic { font-size: 16px; width: 22px; text-align: center; }
+
+        .sidebar .logout {
+            margin-top: auto;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--red);
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .sidebar .logout:hover { background: rgba(239, 68, 68, 0.2); }
+
+        .main {
+            margin-left: 230px;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .topbar h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .topbar .user-chip {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 9px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .topbar-exit {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--red);
+            border-radius: 12px;
+            padding: 9px 14px;
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .topbar-exit:hover { background: rgba(239, 68, 68, 0.2); }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card h3 {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        input[type="text"], input[type="url"], input[type="password"], input[type="number"], input[type="datetime-local"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .field-hint {
+            margin-top: 6px;
+            font-size: 11px;
+            color: #8a85b0;
+            line-height: 1.4;
+        }
+
+        .field-hint b { color: #ff0080; font-weight: 700; }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-red { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .btn-small { padding: 8px 14px; font-size: 11px; }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: var(--panel-2);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+        }
+
+        .list-item .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .list-item .info .thumb {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .list-item .info .t1 { font-size: 13px; font-weight: 700; color: #fff; }
+        .list-item .info .t2 { font-size: 11px; color: var(--muted); }
+
+        .actions { display: flex; gap: 8px; }
+
+        .empty-state {
+            color: var(--muted);
+            font-size: 13px;
+            text-align: center;
+            padding: 30px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 {
+            font-size: 15px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--green);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .toast.error { background: var(--red); }
+
+        .mobile-nav {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { width: 72px; padding: 14px 8px; }
+            .sidebar .logo .name, .sidebar .logo .role, .nav-item span.txt { display: none; }
+            .nav-item { justify-content: center; }
+            .nav-item .ic { width: auto; font-size: 18px; }
+            .sidebar .logout { font-size: 11px; padding: 10px 4px; }
+            .main { margin-left: 72px; padding: 16px; }
+            .topbar-exit { display: block; }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 14px 12px 120px; }
+            .mobile-nav {
+                display: flex;
+                position: fixed;
+                bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+                left: 14px;
+                right: 14px;
+                padding: 6px 8px;
+                background: rgba(22, 28, 46, 0.55);
+                backdrop-filter: blur(24px) saturate(180%);
+                -webkit-backdrop-filter: blur(24px) saturate(180%);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                border-radius: 28px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+                z-index: 40;
+                justify-content: space-around;
+            }
+
+            .mobile-nav .m-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                flex: 1;
+                max-width: 84px;
+                padding: 7px 6px 6px;
+                border-radius: 18px;
+                font-size: 9.5px;
+                font-weight: 700;
+                color: var(--muted);
+                cursor: pointer;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                user-select: none;
+                transition: all 0.25s ease;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .mobile-nav .m-item .ic {
+                font-size: 20px;
+                line-height: 1;
+                filter: grayscale(0.5) brightness(0.85);
+                transition: all 0.25s ease;
+            }
+
+            .mobile-nav .m-item.active {
+                color: #fff;
+                background: linear-gradient(135deg, #6366f1, #ec4899);
+                box-shadow: 0 6px 16px -2px rgba(99, 102, 241, 0.5), 0 2px 6px -1px rgba(236, 72, 153, 0.4);
+            }
+
+            .mobile-nav .m-item.active .ic {
+                filter: none;
+                transform: scale(1.08);
+            }
+
+            .mobile-nav .m-item:active { transform: scale(0.94); }
+
+            .topbar { margin-bottom: 16px; }
+            .topbar h1 { font-size: 16px; }
+            .topbar .user-chip { padding: 7px 12px; font-size: 11px; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .topbar-exit { display: block; padding: 7px 12px; font-size: 10px; }
+
+            .card { padding: 14px; }
+            .card > .btn { width: 100%; padding: 14px; font-size: 13px; }
+            .form-row { grid-template-columns: 1fr; }
+            .list-item { flex-wrap: wrap; padding: 10px 12px; }
+            .list-item .info .thumb { width: 38px; height: 38px; }
+            .actions { width: 100%; justify-content: flex-end; }
+            .actions .btn { flex: 1; }
+        }
+
+        /* ==== UI ENHANCEMENTS: glow / glass / animation / touch ==== */
+        body {
+            background: linear-gradient(135deg, #0a0f1e, #111a33, #0a0f1e, #141a35, #0d1428);
+            background-size: 300% 300%;
+            animation: bgShift 20s ease infinite;
+        }
+        @keyframes bgShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 480px;
+            height: 480px;
+            border-radius: 50%;
+            filter: blur(130px);
+            opacity: 0.22;
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::before { top: -140px; left: -140px; background: #6366f1; animation: orbFloat 16s ease-in-out infinite; }
+        body::after { bottom: -160px; right: -120px; background: #ec4899; animation: orbFloat2 20s ease-in-out infinite; }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 40px) scale(1.15); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-50px, -50px) scale(1.1); }
+        }
+
+        .main { position: relative; z-index: 1; }
+
+        .sidebar {
+            background: rgba(17, 24, 39, 0.78);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            box-shadow: 2px 0 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar .logo .icon {
+            box-shadow: 0 0 22px rgba(99, 102, 241, 0.55);
+            animation: iconPulse 3s ease-in-out infinite;
+        }
+        @keyframes iconPulse {
+            0%, 100% { box-shadow: 0 0 18px rgba(99, 102, 241, 0.45); }
+            50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.6); }
+        }
+
+        .nav-item {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+        .nav-item:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25); }
+        .nav-item.active {
+            box-shadow: 0 4px 18px -2px rgba(99, 102, 241, 0.5);
+            animation: navGlow 2.5s ease-in-out infinite;
+        }
+        @keyframes navGlow {
+            0%, 100% { box-shadow: 0 4px 18px -2px rgba(99, 102, 241, 0.45); }
+            50% { box-shadow: 0 4px 26px -2px rgba(236, 72, 153, 0.55); }
+        }
+        .nav-item:active { transform: scale(0.97); }
+
+        .sidebar .logout { transition: all 0.25s ease; }
+        .sidebar .logout:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -4px rgba(239, 68, 68, 0.5); }
+        .sidebar .logout:active { transform: scale(0.97); }
+
+        .card {
+            background: rgba(17, 24, 39, 0.72);
+            backdrop-filter: blur(14px) saturate(150%);
+            -webkit-backdrop-filter: blur(14px) saturate(150%);
+            border: 1px solid rgba(99, 102, 241, 0.22);
+            box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            animation: rise 0.45s ease both;
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn { transition: all 0.25s ease; }
+        .btn:not(.btn-red):not(.btn-green):not(.btn-ghost) {
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            background-size: 200% 200%;
+            animation: btnShift 6s ease infinite;
+            box-shadow: 0 10px 26px -8px rgba(99, 102, 241, 0.7);
+        }
+        @keyframes btnShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .btn:hover { filter: brightness(1.12); transform: translateY(-2px); }
+        .btn:not(.btn-red):not(.btn-green):not(.btn-ghost):hover { box-shadow: 0 14px 32px -8px rgba(99, 102, 241, 0.9); }
+        .btn-red:hover { box-shadow: 0 10px 24px -6px rgba(239, 68, 68, 0.5); }
+        .btn-green:hover { box-shadow: 0 10px 24px -6px rgba(16, 185, 129, 0.6); }
+        .btn-ghost:hover { box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.4); }
+        .btn:active { transform: translateY(0) scale(0.96); }
+
+        .topbar .user-chip {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .topbar-exit { transition: all 0.25s ease; }
+        .topbar-exit:hover { box-shadow: 0 6px 16px -4px rgba(239, 68, 68, 0.4); }
+        .topbar-exit:active { transform: scale(0.96); }
+
+        input[type="text"], input[type="url"], input[type="password"], input[type="number"], input[type="datetime-local"], select, textarea {
+            background: rgba(0, 0, 0, 0.4);
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22), 0 0 18px rgba(99, 102, 241, 0.25);
+        }
+
+        .list-item {
+            background: rgba(26, 34, 52, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+            animation: rise 0.45s ease both;
+        }
+        .list-item:nth-child(2) { animation-delay: 0.05s; }
+        .list-item:nth-child(3) { animation-delay: 0.1s; }
+        .list-item:nth-child(4) { animation-delay: 0.15s; }
+        .list-item:nth-child(5) { animation-delay: 0.2s; }
+        .list-item:nth-child(6) { animation-delay: 0.25s; }
+        .list-item:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.15);
+        }
+        .list-item:active { transform: scale(0.985); }
+
+        .stat-card {
+            background: rgba(17, 24, 39, 0.72);
+            backdrop-filter: blur(14px) saturate(150%);
+            -webkit-backdrop-filter: blur(14px) saturate(150%);
+            transition: all 0.25s ease;
+            animation: rise 0.45s ease both;
+        }
+        .stat-card:hover { transform: translateY(-3px); border-color: rgba(99, 102, 241, 0.4); box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.6); }
+
+        .modal {
+            background: rgba(17, 24, 39, 0.92);
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8);
+            animation: modalIn 0.28s ease both;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-overlay.show { animation: fadeIn 0.25s ease both; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .toast {
+            animation: toastIn 0.35s ease both;
+            box-shadow: 0 14px 40px -8px rgba(16, 185, 129, 0.5);
+        }
+        .toast.error { box-shadow: 0 14px 40px -8px rgba(239, 68, 68, 0.5); }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        ::selection { background: rgba(99, 102, 241, 0.4); }
+        ::-webkit-scrollbar { width: 9px; height: 9px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.35); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.55); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+            "firebase/analytics": "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js",
+            "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+            "firebase/database": "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+        }
+    }
+    </script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="icon">🛡️</div>
+            <div>
+                <div class="name">PRINCE HACKS</div>
+                <div class="role">Admin Panel</div>
+            </div>
+        </div>
+
+        <div class="nav-item" data-view="overview"><span class="ic">📊</span><span class="txt">Overview</span></div>
+        <div class="nav-item" data-view="keys"><span class="ic">🔑</span><span class="txt">User Keys</span></div>
+        <div class="nav-item active" data-view="categories"><span class="ic">🗂️</span><span class="txt">Categories</span></div>
+        <div class="nav-item" data-view="posts"><span class="ic">📦</span><span class="txt">Posts</span></div>
+        <div class="nav-item" data-view="settings"><span class="ic">⚙️</span><span class="txt">Settings</span></div>
+
+        <button class="logout" id="logoutBtn">LOGOUT</button>
+    </aside>
+
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="m-item" data-view="overview"><span class="ic">📊</span>Home</div>
+        <div class="m-item" data-view="keys"><span class="ic">🔑</span>Keys</div>
+        <div class="m-item active" data-view="categories"><span class="ic">🗂️</span>Cats</div>
+        <div class="m-item" data-view="posts"><span class="ic">📦</span>Posts</div>
+        <div class="m-item" data-view="settings"><span class="ic">⚙️</span>Settings</div>
+    </nav>
+
+    <div class="main">
+        <div class="topbar">
+            <h1 id="pageTitle">Categories</h1>
+            <div class="topbar-right">
+                <div class="user-chip" id="adminEmail">Admin</div>
+                <button class="topbar-exit" onclick="document.getElementById('logoutBtn').click()">🚪 EXIT</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Add New Category</h3>
+            <div class="form-row">
+                <div>
+                    <label>Category Name</label>
+                    <input type="text" id="catNameInput" placeholder="e.g. NEW POSTS">
+                </div>
+                <div>
+                    <label>Icon (emoji)</label>
+                    <input type="text" id="catIconInput" placeholder="e.g. 🔥">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Photo / Image URL</label>
+                    <input type="text" id="catImageInput" placeholder="https://...">
+                    <div class="field-hint">Best size: <b>600 × 400</b> px (chhota card photo)</div>
+                </div>
+                <div>
+                    <label>Posts Count (kitne posts dikhe)</label>
+                    <input type="number" id="catLimitInput" placeholder="e.g. 20" min="1">
+                </div>
+            </div>
+            <button class="btn" onclick="addCategory()">Save Category</button>
+        </div>
+
+        <div class="card">
+            <h3>Categories</h3>
+            <div id="catsList"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalBody"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged, signOut } from "firebase/auth";
+        import { ref, get, set, update, remove } from "firebase/database";
+
+        window.auth = auth;
+        window.db = db;
+        window.signOut = signOut;
+        window.ref = ref;
+        window.get = get;
+        window.set = set;
+        window.update = update;
+        window.remove = remove;
+
+        function applyAdminChip() {
+            const el = document.getElementById("adminEmail");
+            const isMobile = window.matchMedia("(max-width: 900px)").matches || window.matchMedia("(pointer: coarse)").matches;
+            el.innerText = isMobile ? "Admin" : (window.adminEmailAddr || "");
+        }
+        window.applyAdminChip = applyAdminChip;
+        window.addEventListener("resize", applyAdminChip);
+
+        onAuthStateChanged(auth, function(user) {
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+            window.adminEmailAddr = user.email;
+            applyAdminChip();
+            loadCategories();
+
+        });
+
+        document.getElementById("logoutBtn").addEventListener("click", function() {
+            signOut(auth).then(function() {
+                sessionStorage.removeItem("adminLoggedIn");
+                window.location.href = "index.html";
+            });
+        });
+
+        document.querySelectorAll(".nav-item, .m-item").forEach(function(item) {
+            item.addEventListener("click", function() {
+                var view = item.dataset.view;
+                if (view === "logout") {
+                    document.getElementById("logoutBtn").click();
+                    return;
+                }
+                if (view === "categories") return;
+                if (view === "keys") {
+                    window.location.href = "keys.html";
+                    return;
+                }
+                if (view === "posts") {
+                    window.location.href = "posts.html";
+                    return;
+                }
+                if (view === "settings") {
+                    window.location.href = "settings.html";
+                    return;
+                }
+                window.location.href = "dashboard.html?view=" + view;
+            });
+        });
+
+        function showToast(msg, isError) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.className = "toast" + (isError ? " error" : "");
+            toast.style.display = "block";
+            setTimeout(function() { toast.style.display = "none"; }, 2500);
+        }
+        window.showToast = showToast;
+
+        function esc(s) {
+            return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+        window.esc = esc;
+
+        function jsStr(s) {
+            return String(s || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+        }
+        window.jsStr = jsStr;
+
+        function loadCategories() {
+            const list = document.getElementById("catsList");
+            list.innerHTML = '<div class="empty-state">Loading...</div>';
+            get(ref(db, "categories")).then(function(snap) {
+                list.innerHTML = "";
+                if (!snap.exists()) {
+                    list.innerHTML = '<div class="empty-state">No categories yet. Add one above.</div>';
+                    return;
+                }
+                const cats = snap.val();
+                Object.keys(cats).forEach(function(key) {
+                    const data = cats[key] || {};
+                    const item = document.createElement("div");
+                    item.className = "list-item";
+                    item.innerHTML =
+                        '<div class="info">' +
+                        '<img class="thumb" src="' + esc(data.image) + '" alt="">' +
+                        '<div><div class="t1">' + esc(data.icon) + ' ' + esc(data.name) + '</div>' +
+                        '<div class="t2">Posts limit: ' + esc(data.limit || "∞") + ' • ' + esc(key) + '</div></div></div>' +
+                        '<div class="actions">' +
+                        '<button class="btn btn-small" onclick="editCategory(\'' + jsStr(key) + '\')">EDIT</button>' +
+                        '<button class="btn btn-red btn-small" onclick="deleteCategory(\'' + jsStr(key) + '\')">DELETE</button>' +
+                        '</div>';
+                    list.appendChild(item);
+                });
+            }).catch(function() {
+                list.innerHTML = '<div class="empty-state">Error loading categories.</div>';
+            });
+        }
+        window.loadCategories = loadCategories;
+
+        function addCategory() {
+            const name = document.getElementById("catNameInput").value.trim();
+            const icon = document.getElementById("catIconInput").value.trim() || "🗂️";
+            const image = document.getElementById("catImageInput").value.trim();
+            const limit = document.getElementById("catLimitInput").value.trim() || "";
+            if (!name) { showToast("Category name is required!", true); return; }
+            const key = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "cat-" + Date.now();
+            set(ref(db, "categories/" + key), { name: name, icon: icon, image: image, limit: limit })
+                .then(function() {
+                    showToast("Category saved!");
+                    document.getElementById("catNameInput").value = "";
+                    document.getElementById("catIconInput").value = "";
+                    document.getElementById("catImageInput").value = "";
+                    document.getElementById("catLimitInput").value = "";
+                    loadCategories();
+                })
+                .catch(function() { showToast("Error saving category!", true); });
+        }
+        window.addCategory = addCategory;
+
+        function editCategory(key) {
+            get(ref(db, "categories/" + key)).then(function(snap) {
+                const data = snap.val() || {};
+                document.getElementById("modalBody").innerHTML =
+                    '<h3>Edit Category</h3>' +
+                    '<div class="form-row"><div><label>Category Name</label><input type="text" id="mCatName" value="' + esc(data.name) + '"></div>' +
+                    '<div><label>Icon (emoji)</label><input type="text" id="mCatIcon" value="' + esc(data.icon) + '"></div></div>' +
+                    '<div class="form-row"><div><label>Photo / Image URL</label><input type="text" id="mCatImage" value="' + esc(data.image) + '"><div class="field-hint">Best size: <b>600 × 400</b> px</div></div>' +
+                    '<div><label>Posts Count</label><input type="number" id="mCatLimit" value="' + esc(data.limit) + '" min="1"></div></div>' +
+                    '<div style="display: flex; gap: 10px; justify-content: flex-end;">' +
+                    '<button class="btn btn-red btn-small" onclick="closeModal()">CANCEL</button>' +
+                    '<button class="btn btn-small" onclick="saveCategoryEdit(\'' + jsStr(key) + '\')">SAVE</button></div>';
+                document.getElementById("modalOverlay").classList.add("show");
+            });
+        }
+        window.editCategory = editCategory;
+
+        function saveCategoryEdit(key) {
+            const name = document.getElementById("mCatName").value.trim();
+            const icon = document.getElementById("mCatIcon").value.trim() || "🗂️";
+            const image = document.getElementById("mCatImage").value.trim();
+            const limit = document.getElementById("mCatLimit").value.trim() || "";
+            update(ref(db, "categories/" + key), { name: name, icon: icon, image: image, limit: limit })
+                .then(function() {
+                    showToast("Category updated!");
+                    closeModal();
+                    loadCategories();
+                })
+                .catch(function() { showToast("Error!", true); });
+        }
+        window.saveCategoryEdit = saveCategoryEdit;
+
+        function deleteCategory(key) {
+            if (!confirm("Delete category " + key + " and all its posts?")) return;
+            remove(ref(db, "categories/" + key)).then(function() {
+                return remove(ref(db, "posts/" + key));
+            }).then(function() {
+                showToast("Category deleted!");
+                loadCategories();
+            }).catch(function() { showToast("Error!", true); });
+        }
+        window.deleteCategory = deleteCategory;
+
+        function closeModal() {
+            document.getElementById("modalOverlay").classList.remove("show");
+        }
+        window.closeModal = closeModal;
+
+        document.getElementById("modalOverlay").addEventListener("click", function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>

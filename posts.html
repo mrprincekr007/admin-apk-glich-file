@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSTS - ADMIN PANEL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        *,
+        *::before,
+        *::after {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        :focus { outline: none; }
+
+        :root {
+            --bg: #0a0f1e;
+            --panel: #111827;
+            --panel-2: #1a2234;
+            --border: rgba(99, 102, 241, 0.18);
+            --accent: #6366f1;
+            --accent-2: #ec4899;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --green: #10b981;
+            --red: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px 18px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+        }
+
+        .sidebar .logo .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sidebar .logo .name {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .sidebar .logo .role {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            user-select: none;
+        }
+
+        .nav-item:hover { background: var(--panel-2); color: var(--text); }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));
+            color: #fff;
+            border: 1px solid var(--border);
+        }
+
+        .nav-item .ic { font-size: 16px; width: 22px; text-align: center; }
+
+        .sidebar .logout {
+            margin-top: auto;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--red);
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .sidebar .logout:hover { background: rgba(239, 68, 68, 0.2); }
+
+        .main {
+            margin-left: 230px;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .topbar h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .topbar .user-chip {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 9px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .topbar-exit {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--red);
+            border-radius: 12px;
+            padding: 9px 14px;
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .topbar-exit:hover { background: rgba(239, 68, 68, 0.2); }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card h3 {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        input[type="text"], input[type="url"], input[type="password"], input[type="number"], input[type="datetime-local"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .field-hint {
+            margin-top: 6px;
+            font-size: 11px;
+            color: #8a85b0;
+            line-height: 1.4;
+        }
+
+        .field-hint b { color: #ff0080; font-weight: 700; }
+
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .cs-trigger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 13px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .cs-trigger:hover { border-color: rgba(99, 102, 241, 0.5); }
+
+        .cs-trigger .cs-value {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .cs-trigger .cs-arrow {
+            color: var(--accent);
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .custom-select.open .cs-trigger {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .custom-select.open .cs-arrow {
+            transform: rotate(180deg);
+        }
+
+        .cs-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 6px;
+            z-index: 30;
+            max-height: 260px;
+            overflow-y: auto;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+        }
+
+        .custom-select.open .cs-menu {
+            display: block;
+            animation: csIn 0.18s ease-out;
+        }
+
+        .custom-select.open { z-index: 60; }
+        .card:has(.custom-select.open) { position: relative; z-index: 6; }
+
+        @keyframes csIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cs-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.15s;
+            border: 1px solid transparent;
+        }
+
+        .cs-option:hover { background: rgba(99, 102, 241, 0.12); }
+        .cs-option.selected {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));
+            border-color: var(--border);
+            color: #fff;
+        }
+
+        .cs-option .cs-opt-icon { font-size: 16px; width: 22px; text-align: center; }
+        .cs-option .cs-opt-name { flex: 1; }
+        .cs-option .cs-opt-check { color: var(--green); font-weight: 900; }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-red { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .btn-small { padding: 8px 14px; font-size: 11px; }
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--muted);
+            padding: 8px 12px;
+            font-size: 11px;
+        }
+        .btn-ghost:hover { color: #fff; background: rgba(99, 102, 241, 0.2); border-color: rgba(99, 102, 241, 0.4); }
+
+        .post-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            height: 26px;
+            padding: 0 8px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(236, 72, 153, 0.25));
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .list-item.post-card {
+            display: block;
+            padding: 14px;
+        }
+
+        .post-card .post-imgs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .post-card .pi {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 4 / 3;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .post-card .pi img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .post-card .pi .tag {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 8px;
+        }
+
+        .post-card .pi .ph {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .post-card .post-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .post-card .post-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .post-card .post-title-empty {
+            color: #94a3b8;
+            font-style: italic;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .post-card .post-cat {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .post-card .post-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .post-card .post-badges .badge {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #c7d2fe;
+        }
+
+        .post-card .post-badges .badge.zip {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #a7f3d0;
+        }
+
+        .post-card .post-badges .badge.none {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .post-card .post-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        @media (min-width: 701px) and (max-width: 1050px) {
+            #postsList {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+                align-items: start;
+            }
+        }
+
+        @media (min-width: 1051px) {
+            #postsList {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 14px;
+                align-items: start;
+            }
+        }
+
+        @media (min-width: 701px) {
+            .post-card .post-actions {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .post-card .post-actions .btn {
+                font-size: 12px;
+                padding: 10px 8px;
+            }
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: var(--panel-2);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+        }
+
+        .list-item .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .list-item .info .thumb {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .list-item .info .t1 { font-size: 13px; font-weight: 700; color: #fff; }
+        .list-item .info .t2 { font-size: 11px; color: var(--muted); }
+
+        .actions { display: flex; gap: 8px; }
+
+        .empty-state {
+            color: var(--muted);
+            font-size: 13px;
+            text-align: center;
+            padding: 30px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 {
+            font-size: 15px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--green);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .toast.error { background: var(--red); }
+
+        .mobile-nav {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { width: 72px; padding: 14px 8px; }
+            .sidebar .logo .name, .sidebar .logo .role, .nav-item span.txt { display: none; }
+            .nav-item { justify-content: center; }
+            .nav-item .ic { width: auto; font-size: 18px; }
+            .sidebar .logout { font-size: 11px; padding: 10px 4px; }
+            .main { margin-left: 72px; padding: 16px; }
+            .topbar-exit { display: block; }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 14px 12px 120px; }
+            .mobile-nav {
+                display: flex;
+                position: fixed;
+                bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+                left: 14px;
+                right: 14px;
+                padding: 6px 8px;
+                background: rgba(22, 28, 46, 0.55);
+                backdrop-filter: blur(24px) saturate(180%);
+                -webkit-backdrop-filter: blur(24px) saturate(180%);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                border-radius: 28px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+                z-index: 40;
+                justify-content: space-around;
+            }
+
+            .mobile-nav .m-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                flex: 1;
+                max-width: 84px;
+                padding: 7px 6px 6px;
+                border-radius: 18px;
+                font-size: 9.5px;
+                font-weight: 700;
+                color: var(--muted);
+                cursor: pointer;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                user-select: none;
+                transition: all 0.25s ease;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .mobile-nav .m-item .ic {
+                font-size: 20px;
+                line-height: 1;
+                filter: grayscale(0.5) brightness(0.85);
+                transition: all 0.25s ease;
+            }
+
+            .mobile-nav .m-item.active {
+                color: #fff;
+                background: linear-gradient(135deg, #6366f1, #ec4899);
+                box-shadow: 0 6px 16px -2px rgba(99, 102, 241, 0.5), 0 2px 6px -1px rgba(236, 72, 153, 0.4);
+            }
+
+            .mobile-nav .m-item.active .ic {
+                filter: none;
+                transform: scale(1.08);
+            }
+
+            .mobile-nav .m-item:active { transform: scale(0.94); }
+
+            .topbar { margin-bottom: 16px; }
+            .topbar h1 { font-size: 16px; }
+            .topbar .user-chip { padding: 7px 12px; font-size: 11px; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .topbar-exit { display: block; padding: 7px 12px; font-size: 10px; }
+
+            .card { padding: 14px; }
+            .card > .btn { width: 100%; padding: 14px; font-size: 13px; }
+            .form-row { grid-template-columns: 1fr; }
+            .list-item { flex-wrap: wrap; padding: 10px 12px; }
+            .list-item .info .thumb { width: 38px; height: 38px; }
+            .actions { width: 100%; justify-content: flex-end; }
+            .actions .btn { flex: 1; }
+            .post-card .post-actions .btn { flex: 1; }
+        }
+
+        /* ==== UI ENHANCEMENTS: glow / glass / animation / touch ==== */
+        body {
+            background: linear-gradient(135deg, #0a0f1e, #111a33, #0a0f1e, #141a35, #0d1428);
+            background-size: 300% 300%;
+            animation: bgShift 20s ease infinite;
+        }
+        @keyframes bgShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 480px;
+            height: 480px;
+            border-radius: 50%;
+            filter: blur(130px);
+            opacity: 0.22;
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::before { top: -140px; left: -140px; background: #6366f1; animation: orbFloat 16s ease-in-out infinite; }
+        body::after { bottom: -160px; right: -120px; background: #ec4899; animation: orbFloat2 20s ease-in-out infinite; }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 40px) scale(1.15); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-50px, -50px) scale(1.1); }
+        }
+
+        .main { position: relative; z-index: 1; }
+
+        .sidebar {
+            background: rgba(17, 24, 39, 0.78);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            box-shadow: 2px 0 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar .logo .icon {
+            box-shadow: 0 0 22px rgba(99, 102, 241, 0.55);
+            animation: iconPulse 3s ease-in-out infinite;
+        }
+        @keyframes iconPulse {
+            0%, 100% { box-shadow: 0 0 18px rgba(99, 102, 241, 0.45); }
+            50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.6); }
+        }
+
+        .nav-item {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+        .nav-item:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25); }
+        .nav-item.active {
+            box-shadow: 0 4px 18px -2px rgba(99, 102, 241, 0.5);
+            animation: navGlow 2.5s ease-in-out infinite;
+        }
+        @keyframes navGlow {
+            0%, 100% { box-shadow: 0 4px 18px -2px rgba(99, 102, 241, 0.45); }
+            50% { box-shadow: 0 4px 26px -2px rgba(236, 72, 153, 0.55); }
+        }
+        .nav-item:active { transform: scale(0.97); }
+
+        .sidebar .logout { transition: all 0.25s ease; }
+        .sidebar .logout:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -4px rgba(239, 68, 68, 0.5); }
+        .sidebar .logout:active { transform: scale(0.97); }
+
+        .card {
+            background: rgba(17, 24, 39, 0.72);
+            backdrop-filter: blur(14px) saturate(150%);
+            -webkit-backdrop-filter: blur(14px) saturate(150%);
+            border: 1px solid rgba(99, 102, 241, 0.22);
+            box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            animation: rise 0.45s ease both;
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn { transition: all 0.25s ease; }
+        .btn:not(.btn-red):not(.btn-green):not(.btn-ghost) {
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            background-size: 200% 200%;
+            animation: btnShift 6s ease infinite;
+            box-shadow: 0 10px 26px -8px rgba(99, 102, 241, 0.7);
+        }
+        @keyframes btnShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .btn:hover { filter: brightness(1.12); transform: translateY(-2px); }
+        .btn:not(.btn-red):not(.btn-green):not(.btn-ghost):hover { box-shadow: 0 14px 32px -8px rgba(99, 102, 241, 0.9); }
+        .btn-red:hover { box-shadow: 0 10px 24px -6px rgba(239, 68, 68, 0.5); }
+        .btn-green:hover { box-shadow: 0 10px 24px -6px rgba(16, 185, 129, 0.6); }
+        .btn-ghost:hover { box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.4); }
+        .btn:active { transform: translateY(0) scale(0.96); }
+
+        .topbar .user-chip {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .topbar-exit { transition: all 0.25s ease; }
+        .topbar-exit:hover { box-shadow: 0 6px 16px -4px rgba(239, 68, 68, 0.4); }
+        .topbar-exit:active { transform: scale(0.96); }
+
+        input[type="text"], input[type="url"], input[type="password"], input[type="number"], input[type="datetime-local"], select, textarea {
+            background: rgba(0, 0, 0, 0.4);
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22), 0 0 18px rgba(99, 102, 241, 0.25);
+        }
+
+        .list-item {
+            background: rgba(26, 34, 52, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+            animation: rise 0.45s ease both;
+        }
+        .list-item:nth-child(2) { animation-delay: 0.05s; }
+        .list-item:nth-child(3) { animation-delay: 0.1s; }
+        .list-item:nth-child(4) { animation-delay: 0.15s; }
+        .list-item:nth-child(5) { animation-delay: 0.2s; }
+        .list-item:nth-child(6) { animation-delay: 0.25s; }
+        .list-item:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.15);
+        }
+        .list-item:active { transform: scale(0.985); }
+
+        .stat-card {
+            background: rgba(17, 24, 39, 0.72);
+            backdrop-filter: blur(14px) saturate(150%);
+            -webkit-backdrop-filter: blur(14px) saturate(150%);
+            transition: all 0.25s ease;
+            animation: rise 0.45s ease both;
+        }
+        .stat-card:hover { transform: translateY(-3px); border-color: rgba(99, 102, 241, 0.4); box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.6); }
+
+        .modal {
+            background: rgba(17, 24, 39, 0.92);
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8);
+            animation: modalIn 0.28s ease both;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-overlay.show { animation: fadeIn 0.25s ease both; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .toast {
+            animation: toastIn 0.35s ease both;
+            box-shadow: 0 14px 40px -8px rgba(16, 185, 129, 0.5);
+        }
+        .toast.error { box-shadow: 0 14px 40px -8px rgba(239, 68, 68, 0.5); }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        ::selection { background: rgba(99, 102, 241, 0.4); }
+        ::-webkit-scrollbar { width: 9px; height: 9px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.35); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.55); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+            "firebase/analytics": "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js",
+            "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+            "firebase/database": "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+        }
+    }
+    </script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="icon">🛡️</div>
+            <div>
+                <div class="name">PRINCE HACKS</div>
+                <div class="role">Admin Panel</div>
+            </div>
+        </div>
+
+        <div class="nav-item" data-view="overview"><span class="ic">📊</span><span class="txt">Overview</span></div>
+        <div class="nav-item" data-view="keys"><span class="ic">🔑</span><span class="txt">User Keys</span></div>
+        <div class="nav-item" data-view="categories"><span class="ic">🗂️</span><span class="txt">Categories</span></div>
+        <div class="nav-item active" data-view="posts"><span class="ic">📦</span><span class="txt">Posts</span></div>
+        <div class="nav-item" data-view="settings"><span class="ic">⚙️</span><span class="txt">Settings</span></div>
+
+        <button class="logout" id="logoutBtn">LOGOUT</button>
+    </aside>
+
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="m-item" data-view="overview"><span class="ic">📊</span>Home</div>
+        <div class="m-item" data-view="keys"><span class="ic">🔑</span>Keys</div>
+        <div class="m-item" data-view="categories"><span class="ic">🗂️</span>Cats</div>
+        <div class="m-item active" data-view="posts"><span class="ic">📦</span>Posts</div>
+        <div class="m-item" data-view="settings"><span class="ic">⚙️</span>Settings</div>
+    </nav>
+
+    <div class="main">
+        <div class="topbar">
+            <h1 id="pageTitle">Posts</h1>
+            <div class="topbar-right">
+                <div class="user-chip" id="adminEmail">Admin</div>
+                <button class="topbar-exit" onclick="document.getElementById('logoutBtn').click()">🚪 EXIT</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Select Category</h3>
+            <div class="custom-select">
+                <button type="button" class="cs-trigger" onclick="toggleCatDropdown()">
+                    <span class="cs-value" id="postCatValue">-- Select category --</span>
+                    <span class="cs-arrow" id="postCatArrow">▾</span>
+                </button>
+                <div class="cs-menu" id="postCatMenu"></div>
+            </div>
+        </div>
+
+        <div class="card" id="addPostCard" style="display: none;">
+            <h3>Add New Post</h3>
+            <div class="form-row">
+                <div>
+                    <label>Title</label>
+                    <input type="text" id="postTitleInput" placeholder="Post title">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Photo 1 URL (Before)</label>
+                    <input type="url" id="postImg1Input" placeholder="https://...">
+                    <div class="field-hint">Best size: <b>800 × 600</b> px (dono photo same size rakho)</div>
+                </div>
+                <div>
+                    <label>Photo 2 URL (After)</label>
+                    <input type="url" id="postImg2Input" placeholder="https://...">
+                    <div class="field-hint">Best size: <b>800 × 600</b> px (dono photo same size rakho)</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Free Fire Link</label>
+                    <input type="url" id="postLinkInput" placeholder="https://...">
+                </div>
+                <div>
+                    <label>Free Fire MAX Link</label>
+                    <input type="url" id="postLink2Input" placeholder="https://...">
+                    <div class="field-hint">Khaali chhod do to Free Fire MAX button nahi dikhega</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>ZIP Download Link</label>
+                    <input type="url" id="postZipInput" placeholder="https://....zip">
+                    <div class="field-hint">ZIP file link — MediaFire / Google Drive / direct .zip supported. App me DOWNLOAD ZIP button aayega (background download + extract, no browser).</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Post Number (position)</label>
+                    <input type="number" id="postNumInput" placeholder="Auto = last position" min="1">
+                </div>
+            </div>
+            <button class="btn" onclick="addPost()">Save Post</button>
+        </div>
+
+        <div class="card">
+            <h3>Posts in Selected Category</h3>
+            <div id="postsList"><div class="empty-state">Loading all posts...</div></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalBody"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged, signOut } from "firebase/auth";
+        import { ref, get, set, remove, push, onValue, update, query, orderByChild } from "firebase/database";
+
+        window.auth = auth;
+        window.db = db;
+        window.signOut = signOut;
+        window.ref = ref;
+        window.get = get;
+        window.set = set;
+        window.remove = remove;
+        window.push = push;
+        window.onValue = onValue;
+        window.update = update;
+
+        let selectedCatKey = "";
+        let catNameMap = {};
+
+        function applyAdminChip() {
+            const el = document.getElementById("adminEmail");
+            const isMobile = window.matchMedia("(max-width: 900px)").matches || window.matchMedia("(pointer: coarse)").matches;
+            el.innerText = isMobile ? "Admin" : (window.adminEmailAddr || "");
+        }
+        window.applyAdminChip = applyAdminChip;
+        window.addEventListener("resize", applyAdminChip);
+
+        onAuthStateChanged(auth, function(user) {
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+            window.adminEmailAddr = user.email;
+            applyAdminChip();
+            loadPostCategorySelect();
+        });
+
+        document.getElementById("logoutBtn").addEventListener("click", function() {
+            signOut(auth).then(function() {
+                sessionStorage.removeItem("adminLoggedIn");
+                window.location.href = "index.html";
+            });
+        });
+
+        document.querySelectorAll(".nav-item, .m-item").forEach(function(item) {
+            item.addEventListener("click", function() {
+                var view = item.dataset.view;
+                if (view === "logout") {
+                    document.getElementById("logoutBtn").click();
+                    return;
+                }
+                if (view === "posts") return;
+                if (view === "settings") {
+                    window.location.href = "settings.html";
+                    return;
+                }
+                if (view === "categories") {
+                    window.location.href = "categories.html";
+                    return;
+                }
+                if (view === "keys") {
+                    window.location.href = "keys.html";
+                    return;
+                }
+                window.location.href = "dashboard.html?view=" + view;
+            });
+        });
+
+        function showToast(msg, isError) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.className = "toast" + (isError ? " error" : "");
+            toast.style.display = "block";
+            setTimeout(function() { toast.style.display = "none"; }, 2500);
+        }
+        window.showToast = showToast;
+
+        function esc(s) {
+            return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+        window.esc = esc;
+
+        function jsStr(s) {
+            return String(s || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+        }
+        window.jsStr = jsStr;
+
+        function loadPostCategorySelect() {
+            const menu = document.getElementById("postCatMenu");
+            get(ref(db, "categories")).then(function(snap) {
+                menu.innerHTML = "";
+                if (!snap.exists()) {
+                    menu.innerHTML = '<div class="cs-option">No categories yet.</div>';
+                    return;
+                }
+                const cats = snap.val();
+                Object.keys(cats).forEach(function(key) {
+                    const data = cats[key] || {};
+                    catNameMap[key] = data.name || key;
+                    const opt = document.createElement("div");
+                    opt.className = "cs-option" + (selectedCatKey === key ? " selected" : "");
+                    opt.dataset.key = key;
+                    opt.innerHTML =
+                        '<span class="cs-opt-icon">' + esc(data.icon || "🗂️") + '</span>' +
+                        '<span class="cs-opt-name">' + esc(data.name || key) + '</span>' +
+                        '<span class="cs-opt-check">' + (selectedCatKey === key ? "✓" : "") + '</span>';
+                    opt.addEventListener("click", function() {
+                        selectPostCat(key, data.name || key, data.icon || "🗂️");
+                    });
+                    menu.appendChild(opt);
+                });
+                loadPostsForCat();
+            });
+        }
+        window.loadPostCategorySelect = loadPostCategorySelect;
+
+        function selectPostCat(key, name, icon) {
+            selectedCatKey = key;
+            document.getElementById("postCatValue").innerText = (icon ? icon + " " : "") + name;
+            document.getElementById("postCatMenu").querySelectorAll(".cs-option").forEach(function(o) {
+                const isSel = o.dataset.key === key;
+                o.classList.toggle("selected", isSel);
+                o.querySelector(".cs-opt-check").innerText = isSel ? "✓" : "";
+            });
+            closeCatDropdown();
+            loadPostsForCat();
+        }
+        window.selectPostCat = selectPostCat;
+
+        function toggleCatDropdown() {
+            const wrap = document.getElementById("postCatMenu").parentElement;
+            wrap.classList.toggle("open");
+        }
+        window.toggleCatDropdown = toggleCatDropdown;
+
+        function closeCatDropdown() {
+            document.getElementById("postCatMenu").parentElement.classList.remove("open");
+        }
+        window.closeCatDropdown = closeCatDropdown;
+
+        document.addEventListener("click", function(e) {
+            if (!e.target.closest(".custom-select")) {
+                closeCatDropdown();
+            }
+        });
+
+        function loadPostsForCat() {
+            const catKey = selectedCatKey;
+            const list = document.getElementById("postsList");
+            document.getElementById("addPostCard").style.display = catKey ? "block" : "none";
+            list.innerHTML = '<div class="empty-state">Loading...</div>';
+            get(ref(db, "posts")).then(function(snap) {
+                list.innerHTML = "";
+                const all = [];
+                if (snap.exists()) {
+                    const cats = snap.val();
+                    if (catKey) {
+                        Object.keys(cats[catKey] || {}).forEach(function(postId) {
+                            all.push({ catKey: catKey, postId: postId, post: cats[catKey][postId] || {} });
+                        });
+                    } else {
+                        Object.keys(cats).forEach(function(ck) {
+                            Object.keys(cats[ck] || {}).forEach(function(postId) {
+                                all.push({ catKey: ck, postId: postId, post: cats[ck][postId] || {} });
+                            });
+                        });
+                    }
+                }
+                if (!all.length) {
+                    list.innerHTML = '<div class="empty-state">' + (catKey ? "No posts in this category yet." : "No posts yet. Select a category and add one.") + '</div>';
+                    return;
+                }
+                all.sort(function(a, b) {
+                    const oa = postOrderOf(a.post, a.postId);
+                    const ob = postOrderOf(b.post, b.postId);
+                    if (oa !== ob) return oa - ob;
+                    return idNum(a.postId) - idNum(b.postId);
+                });
+                all.forEach(function(entry) {
+                    const p = entry.post;
+                    const catKey2 = entry.catKey;
+                    const postId = entry.postId;
+                    const item = document.createElement("div");
+                    item.className = "list-item post-card";
+                    let catLabel = "";
+                    if (!catKey) {
+                        catLabel = '<div class="post-cat">🗂️ ' + esc(catNameMap[catKey2] || catKey2) + '</div>';
+                    }
+                    let badges = "";
+                    if (p.link) badges += '<span class="badge">🎮 Free Fire</span>';
+                    if (p.link2) badges += '<span class="badge">🎮 FF MAX</span>';
+                    if (p.zipLink) badges += '<span class="badge zip">📦 ZIP</span>';
+                    if (!badges) badges = '<span class="badge none">No links</span>';
+                    item.innerHTML =
+                        catLabel +
+                        '<div class="post-imgs">' +
+                        '<div class="pi">' + (p.img1 ? '<img src="' + esc(p.img1) + '" alt="Before"><span class="tag">Before</span>' : '<div class="ph">No photo</div>') + '</div>' +
+                        '<div class="pi">' + (p.img2 ? '<img src="' + esc(p.img2) + '" alt="After"><span class="tag">After</span>' : '<div class="ph">No photo</div>') + '</div>' +
+                        '</div>' +
+                        '<div class="post-top">' +
+                        '<div class="post-title' + (p.title ? '' : ' post-title-empty') + '">' + esc(p.title || "No title") + '</div>' +
+                        '<span class="post-num">#' + postOrderOf(p, postId) + '</span>' +
+                        '</div>' +
+                        '<div class="post-badges">' + badges + '</div>' +
+                        '<div class="post-actions">' +
+                        '<button class="btn btn-ghost btn-small" title="Move up" onclick="movePost(\'' + jsStr(catKey2) + '\',\'' + jsStr(postId) + '\',-1)">▲</button>' +
+                        '<button class="btn btn-ghost btn-small" title="Move down" onclick="movePost(\'' + jsStr(catKey2) + '\',\'' + jsStr(postId) + '\',1)">▼</button>' +
+                        '<button class="btn btn-small" onclick="editPost(\'' + jsStr(catKey2) + '\',\'' + jsStr(postId) + '\')">EDIT</button>' +
+                        '<button class="btn btn-red btn-small" onclick="deletePost(\'' + jsStr(catKey2) + '\',\'' + jsStr(postId) + '\')">DELETE</button>' +
+                        '</div>';
+                    list.appendChild(item);
+                });
+            }).catch(function() {
+                list.innerHTML = '<div class="empty-state">Error loading posts.</div>';
+            });
+        }
+        window.loadPostsForCat = loadPostsForCat;
+
+        function idNum(id) {
+            return parseInt(String(id || "").replace(/\D+/g, ""), 10) || 0;
+        }
+
+        function postOrderOf(post, postId) {
+            if (post && typeof post.order === "number") return post.order;
+            return idNum(postId);
+        }
+
+        function movePost(catKey, postId, dir) {
+            get(ref(db, "posts/" + catKey)).then(function(snap) {
+                if (!snap.exists()) return;
+                const posts = snap.val();
+                const ids = Object.keys(posts).sort(function(a, b) {
+                    const oa = postOrderOf(posts[a], a);
+                    const ob = postOrderOf(posts[b], b);
+                    if (oa !== ob) return oa - ob;
+                    return idNum(a) - idNum(b);
+                });
+                const idx = ids.indexOf(postId);
+                const other = ids[idx + dir];
+                if (idx < 0 || !other) { showToast("Already at edge!", true); return; }
+                const curOrder = postOrderOf(posts[postId], postId);
+                const otherOrder = postOrderOf(posts[other], other);
+                const updates = {};
+                updates["posts/" + catKey + "/" + postId + "/order"] = otherOrder;
+                updates["posts/" + catKey + "/" + other + "/order"] = curOrder;
+                update(ref(db), updates)
+                    .then(function() {
+                        showToast("Order updated!");
+                        loadPostsForCat();
+                    })
+                    .catch(function() { showToast("Error!", true); });
+            });
+        }
+        window.movePost = movePost;
+
+        function addPost() {
+            const catKey = selectedCatKey;
+            const title = document.getElementById("postTitleInput").value.trim();
+            const img1 = document.getElementById("postImg1Input").value.trim();
+            const img2 = document.getElementById("postImg2Input").value.trim();
+            const link = document.getElementById("postLinkInput").value.trim();
+            const link2 = document.getElementById("postLink2Input").value.trim();
+            const zipLink = document.getElementById("postZipInput").value.trim();
+            const wantOrder = parseInt(document.getElementById("postNumInput").value, 10);
+            if (!catKey) { showToast("Select a category first!", true); return; }
+            get(ref(db, "posts/" + catKey)).then(function(snap) {
+                let max = 0;
+                if (snap.exists()) {
+                    const pst = snap.val();
+                    Object.keys(pst).forEach(function(k) {
+                        const v = postOrderOf(pst[k], k);
+                        if (v > max) max = v;
+                    });
+                }
+                const order = isNaN(wantOrder) ? (max + 1) : wantOrder;
+                const postId = "post-" + Date.now();
+                return set(ref(db, "posts/" + catKey + "/" + postId),
+                    { title: title, img1: img1, img2: img2, link: link, link2: link2, zipLink: zipLink, order: order });
+            })
+                .then(function() {
+                    showToast("Post saved!");
+                    document.getElementById("postTitleInput").value = "";
+                    document.getElementById("postImg1Input").value = "";
+                    document.getElementById("postImg2Input").value = "";
+                    document.getElementById("postLinkInput").value = "";
+                    document.getElementById("postLink2Input").value = "";
+                    document.getElementById("postZipInput").value = "";
+                    document.getElementById("postNumInput").value = "";
+                    loadPostsForCat();
+                })
+                .catch(function() { showToast("Error saving post!", true); });
+        }
+        window.addPost = addPost;
+
+        function editPost(catKey, postId) {
+            get(ref(db, "posts/" + catKey + "/" + postId)).then(function(snap) {
+                const p = snap.val() || {};
+                const curOrder = postOrderOf(p, postId);
+                document.getElementById("modalBody").innerHTML =
+                    '<h3>Edit Post</h3>' +
+                    '<div class="form-row"><div><label>Title</label><input type="text" id="mPostTitle" value="' + esc(p.title) + '"></div></div>' +
+                    '<div class="form-row"><div><label>Photo 1 URL</label><input type="text" id="mPostImg1" value="' + esc(p.img1) + '"><div class="field-hint">Best size: <b>800 × 600</b> px</div></div>' +
+                    '<div><label>Photo 2 URL</label><input type="text" id="mPostImg2" value="' + esc(p.img2) + '"><div class="field-hint">Best size: <b>800 × 600</b> px</div></div></div>' +
+                    '<div class="form-row"><div><label>Free Fire Link</label><input type="text" id="mPostLink" value="' + esc(p.link) + '"></div>' +
+                    '<div><label>Free Fire MAX Link</label><input type="text" id="mPostLink2" value="' + esc(p.link2) + '"></div></div>' +
+                    '<div class="form-row"><div><label>ZIP Download Link</label><input type="text" id="mPostZip" value="' + esc(p.zipLink) + '"><div class="field-hint">MediaFire / Google Drive / direct .zip — background download + extract</div></div></div>' +
+                    '<div class="form-row"><div><label>Post Number (position)</label><input type="number" id="mPostNum" value="' + esc(curOrder) + '" min="1"></div></div>' +
+                    '<div style="display: flex; gap: 10px; justify-content: flex-end;">' +
+                    '<button class="btn btn-red btn-small" onclick="closeModal()">CANCEL</button>' +
+                    '<button class="btn btn-small" onclick="savePostEdit(\'' + jsStr(catKey) + '\',\'' + jsStr(postId) + '\')">SAVE</button></div>';
+                document.getElementById("modalOverlay").classList.add("show");
+            });
+        }
+        window.editPost = editPost;
+
+        function savePostEdit(catKey, postId) {
+            const title = document.getElementById("mPostTitle").value.trim();
+            const img1 = document.getElementById("mPostImg1").value.trim();
+            const img2 = document.getElementById("mPostImg2").value.trim();
+            const link = document.getElementById("mPostLink").value.trim();
+            const link2 = document.getElementById("mPostLink2").value.trim();
+            const zipLink = document.getElementById("mPostZip").value.trim();
+            let order = parseInt(document.getElementById("mPostNum").value, 10);
+            if (isNaN(order)) order = postOrderOf(null, postId);
+            set(ref(db, "posts/" + catKey + "/" + postId), { title: title, img1: img1, img2: img2, link: link, link2: link2, zipLink: zipLink, order: order })
+                .then(function() {
+                    showToast("Post updated!");
+                    closeModal();
+                    loadPostsForCat();
+                })
+                .catch(function() { showToast("Error!", true); });
+        }
+        window.savePostEdit = savePostEdit;
+
+        function deletePost(catKey, postId) {
+            if (!confirm("Delete this post?")) return;
+            remove(ref(db, "posts/" + catKey + "/" + postId)).then(function() {
+                showToast("Post deleted!");
+                loadPostsForCat();
+            }).catch(function() { showToast("Error!", true); });
+        }
+        window.deletePost = deletePost;
+
+        function closeModal() {
+            document.getElementById("modalOverlay").classList.remove("show");
+        }
+        window.closeModal = closeModal;
+
+        document.getElementById("modalOverlay").addEventListener("click", function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>

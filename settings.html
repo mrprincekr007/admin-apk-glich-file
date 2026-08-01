@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SETTINGS - ADMIN PANEL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        *,
+        *::before,
+        *::after {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        :focus { outline: none; }
+
+        :root {
+            --bg: #0a0f1e;
+            --panel: #111827;
+            --panel-2: #1a2234;
+            --border: rgba(99, 102, 241, 0.18);
+            --accent: #6366f1;
+            --accent-2: #ec4899;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --green: #10b981;
+            --red: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px 18px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+        }
+
+        .sidebar .logo .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sidebar .logo .name {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .sidebar .logo .role {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            user-select: none;
+        }
+
+        .nav-item:hover { background: var(--panel-2); color: var(--text); }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));
+            color: #fff;
+            border: 1px solid var(--border);
+        }
+
+        .nav-item .ic { font-size: 16px; width: 22px; text-align: center; }
+
+        .sidebar .logout {
+            margin-top: auto;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--red);
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .sidebar .logout:hover { background: rgba(239, 68, 68, 0.2); }
+
+        .main {
+            margin-left: 230px;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .topbar h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .topbar .user-chip {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 9px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .topbar-exit {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--red);
+            border-radius: 12px;
+            padding: 9px 14px;
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .topbar-exit:hover { background: rgba(239, 68, 68, 0.2); }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card h3 {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        input[type="text"], input[type="url"], input[type="password"], input[type="number"], input[type="datetime-local"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 44px;
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.35);
+            cursor: pointer;
+        }
+
+        .field-hint {
+            margin-top: 6px;
+            font-size: 11px;
+            color: #8a85b0;
+            line-height: 1.4;
+        }
+
+        .field-hint b { color: #ff0080; font-weight: 700; }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-red { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .btn-small { padding: 8px 14px; font-size: 11px; }
+        .btn-outline { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.16); color: var(--text); }
+        .btn-outline:hover { background: rgba(255,255,255,0.12); }
+
+        .theme-head {
+            display: flex; align-items: center; gap: 12px;
+            padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 14px;
+        }
+        .theme-head .t-icon {
+            width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+        }
+        .theme-head h3 { margin-bottom: 0; flex: 1; }
+        .theme-live {
+            font-size: 10px; font-weight: 800; letter-spacing: 1px; color: var(--green);
+            border: 1px solid rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.12);
+            padding: 4px 10px; border-radius: 20px;
+        }
+        .card-sub { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 18px; }
+        .card-sub b { color: #ff0080; }
+
+        .theme-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+        .theme-left { min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+        .theme-pickers { min-width: 0; }
+        .swatch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .swatch {
+            overflow: hidden; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(0,0,0,0.4);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            transition: transform .18s, border-color .2s, box-shadow .2s;
+        }
+        .swatch:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.3); box-shadow: 0 12px 26px rgba(0,0,0,0.45); }
+        .swatch-btn { position: relative; display: block; cursor: pointer; }
+        .swatch-btn input[type="color"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: none; background: none; }
+        .swatch-fill { display: block; height: 56px; background: var(--swatch, #333); transition: background .15s; border-bottom: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 -16px 22px -16px rgba(0,0,0,0.75); }
+        .swatch-info { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 10px 11px; }
+        .swatch-name { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--text); white-space: nowrap; }
+        .swatch-hex {
+            font-size: 10.5px; font-family: Consolas, Menlo, monospace; color: var(--muted);
+            background: none; border: none; padding: 3px 6px; border-radius: 6px; cursor: copy;
+            transition: color .15s, background .15s; flex-shrink: 0;
+        }
+        .swatch-hex:hover { color: #fff; background: rgba(255,255,255,0.12); }
+
+        .theme-presets, .theme-preview { min-width: 0; }
+        .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .preset {
+            display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+            padding: 12px 12px; border-radius: 13px; background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.10); color: var(--text);
+            font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px;
+            cursor: pointer; transition: all .18s; font-family: inherit;
+        }
+        .preset:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.3); box-shadow: 0 8px 20px rgba(0,0,0,0.35); }
+        .preset-active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(99,102,241,0.35), 0 8px 20px rgba(0,0,0,0.35); }
+        .preset-dots { display: flex; gap: 5px; }
+        .preset-dots i { width: 14px; height: 14px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3); }
+        .preset-dots.single i { width: 18px; height: 18px; border-radius: 50%; border-color: rgba(255,255,255,0.4); }
+        .preset-name { line-height: 1; }
+
+        .phone-wrap { display: flex; justify-content: center; }
+        .phone {
+            position: relative;
+            width: 100%; max-width: 250px; border-radius: 34px; padding: 11px;
+            background: linear-gradient(150deg, #1c1c2e, #0b0b16);
+            border: 1px solid rgba(255,255,255,0.16); box-shadow: 0 20px 44px rgba(0,0,0,0.55);
+        }
+        .phone::before {
+            content: ""; position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
+            width: 70px; height: 18px; border-radius: 10px; background: #0a0a12; z-index: 2;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .phone-screen {
+            border-radius: 24px; overflow: hidden; aspect-ratio: 9 / 18;
+            display: flex; flex-direction: column;
+        }
+        .pv-status { display: flex; align-items: center; justify-content: space-between; padding: 16px 14px 2px; }
+        .pv-time { font-size: 9px; font-weight: 800; color: #fff; letter-spacing: .5px; }
+        .pv-right { display: flex; align-items: center; gap: 6px; }
+        .pv-signal { display: flex; align-items: flex-end; gap: 2px; }
+        .pv-signal i { width: 3px; background: #fff; border-radius: 1px; opacity: .85; }
+        .pv-signal i:nth-child(1) { height: 4px; }
+        .pv-signal i:nth-child(2) { height: 7px; }
+        .pv-signal i:nth-child(3) { height: 9px; }
+        .pv-batt { width: 16px; height: 8px; border: 1px solid rgba(255,255,255,0.6); border-radius: 2px; padding: 1px; display: flex; align-items: center; }
+        .pv-batt i { display: block; width: 70%; height: 100%; border-radius: 1px; }
+        .pv-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 16px 10px; }
+        .pv-title {
+            font-size: 16px; font-weight: 900; letter-spacing: 1.5px;
+            background-image: linear-gradient(90deg, #fff, #ff0080);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 3px;
+        }
+        .pv-sub { font-size: 8.5px; letter-spacing: .5px; margin-bottom: 10px; }
+        .pv-card { width: 100%; border: 1px solid; border-radius: 12px; padding: 12px 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+        .pv-klabel { font-size: 7px; font-weight: 800; letter-spacing: 1.5px; }
+        .pv-field { height: 24px; border-radius: 7px; border: 1px solid; background: rgba(0,0,0,0.5); }
+        .pv-btn {
+            height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 900; letter-spacing: 1.5px; color: #fff;
+        }
+        .pv-cats { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+        .pv-cat { height: 42px; border: 1px solid; border-radius: 9px; padding: 8px; display: flex; flex-direction: column; gap: 5px; }
+        .pv-catbar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.18); }
+        .pv-catbar.grad { width: 70%; }
+        .pv-home { width: 120px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.5); margin: 0 auto 10px; }
+        .theme-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+        @media (min-width: 701px) and (max-width: 1100px) {
+            .theme-layout { grid-template-columns: 1fr; gap: 24px; }
+            .swatch-grid { grid-template-columns: repeat(3, 1fr); }
+            .preset-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 700px) {
+            .theme-layout { grid-template-columns: 1fr; gap: 22px; }
+            .swatch-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .preset-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .swatch-fill { height: 44px; }
+            .card > .btn { width: 100%; padding: 14px; font-size: 13px; }
+            .theme-actions .btn { flex: 1 1 100%; }
+            .phone { max-width: 210px; border-radius: 30px; padding: 10px; }
+            .phone::before { width: 60px; height: 16px; top: 18px; }
+        }
+
+        .switch-row { display: flex; align-items: center; gap: 12px; padding-top: 4px; }
+        .switch { position: relative; display: inline-block; width: 52px; height: 28px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+            transition: all 0.25s;
+        }
+        .switch .slider::before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            top: 3px;
+            background: #94a3b8;
+            border-radius: 50%;
+            transition: all 0.25s;
+        }
+        .switch input:checked + .slider {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-color: transparent;
+        }
+        .switch input:checked + .slider::before {
+            transform: translateX(24px);
+            background: #fff;
+        }
+
+        .switch-status {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--green);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .toast.error { background: var(--red); }
+
+        .mobile-nav {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { width: 72px; padding: 14px 8px; }
+            .sidebar .logo .name, .sidebar .logo .role, .nav-item span.txt { display: none; }
+            .nav-item { justify-content: center; }
+            .nav-item .ic { width: auto; font-size: 18px; }
+            .sidebar .logout { font-size: 11px; padding: 10px 4px; }
+            .main { margin-left: 72px; padding: 16px; }
+            .topbar-exit { display: block; }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 14px 12px 120px; }
+            .mobile-nav {
+                display: flex;
+                position: fixed;
+                bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+                left: 14px;
+                right: 14px;
+                padding: 6px 8px;
+                background: rgba(22, 28, 46, 0.55);
+                backdrop-filter: blur(24px) saturate(180%);
+                -webkit-backdrop-filter: blur(24px) saturate(180%);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                border-radius: 28px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+                z-index: 40;
+                justify-content: space-around;
+            }
+
+            .mobile-nav .m-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                flex: 1;
+                max-width: 84px;
+                padding: 7px 6px 6px;
+                border-radius: 18px;
+                font-size: 9.5px;
+                font-weight: 700;
+                color: var(--muted);
+                cursor: pointer;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                user-select: none;
+                transition: all 0.25s ease;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .mobile-nav .m-item .ic {
+                font-size: 20px;
+                line-height: 1;
+                filter: grayscale(0.5) brightness(0.85);
+                transition: all 0.25s ease;
+            }
+
+            .mobile-nav .m-item.active {
+                color: #fff;
+                background: linear-gradient(135deg, #6366f1, #ec4899);
+                box-shadow: 0 6px 16px -2px rgba(99, 102, 241, 0.5), 0 2px 6px -1px rgba(236, 72, 153, 0.4);
+            }
+
+            .mobile-nav .m-item.active .ic {
+                filter: none;
+                transform: scale(1.08);
+            }
+
+            .mobile-nav .m-item:active { transform: scale(0.94); }
+
+            .topbar { margin-bottom: 16px; }
+            .topbar h1 { font-size: 16px; }
+            .topbar .user-chip { padding: 7px 12px; font-size: 11px; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .topbar-exit { display: block; padding: 7px 12px; font-size: 10px; }
+
+            .card { padding: 14px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        /* ==== UI ENHANCEMENTS: glow / glass / animation / touch ==== */
+        body {
+            background: linear-gradient(135deg, #0a0f1e, #111a33, #0a0f1e, #141a35, #0d1428);
+            background-size: 300% 300%;
+            animation: bgShift 20s ease infinite;
+        }
+        @keyframes bgShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 480px;
+            height: 480px;
+            border-radius: 50%;
+            filter: blur(130px);
+            opacity: 0.22;
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::before { top: -140px; left: -140px; background: #6366f1; animation: orbFloat 16s ease-in-out infinite; }
+        body::after { bottom: -160px; right: -120px; background: #ec4899; animation: orbFloat2 20s ease-in-out infinite; }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 40px) scale(1.15); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-50px, -50px) scale(1.1); }
+        }
+
+        .main { position: relative; z-index: 1; }
+
+        .sidebar {
+            background: rgba(17, 24, 39, 0.78);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            box-shadow: 2px 0 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar .logo .icon {
+            box-shadow: 0 0 22px rgba(99, 102, 241, 0.55);
+            animation: iconPulse 3s ease-in-out infinite;
+        }
+        @keyframes iconPulse {
+            0%, 100% { box-shadow: 0 0 18px rgba(99, 102, 241, 0.45); }
+            50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.6); }
+        }
+
+        .nav-item {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+        .nav-item:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25); }
+        .nav-item.active {
+            box-shadow: 0 4px 18px -2px rgba(99, 102, 241, 0.5);
+            animation: navGlow 2.5s ease-in-out infinite;
+        }
+        @keyframes navGlow {
+            0%, 100% { box-shadow: 0 4px 18px -2px rgba(99, 102, 241, 0.45); }
+            50% { box-shadow: 0 4px 26px -2px rgba(236, 72, 153, 0.55); }
+        }
+        .nav-item:active { transform: scale(0.97); }
+
+        .sidebar .logout { transition: all 0.25s ease; }
+        .sidebar .logout:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -4px rgba(239, 68, 68, 0.5); }
+        .sidebar .logout:active { transform: scale(0.97); }
+
+        .card {
+            background: rgba(17, 24, 39, 0.72);
+            backdrop-filter: blur(14px) saturate(150%);
+            -webkit-backdrop-filter: blur(14px) saturate(150%);
+            border: 1px solid rgba(99, 102, 241, 0.22);
+            box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            animation: rise 0.45s ease both;
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn { transition: all 0.25s ease; }
+        .btn:not(.btn-red):not(.btn-green):not(.btn-ghost) {
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            background-size: 200% 200%;
+            animation: btnShift 6s ease infinite;
+            box-shadow: 0 10px 26px -8px rgba(99, 102, 241, 0.7);
+        }
+        @keyframes btnShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .btn:hover { filter: brightness(1.12); transform: translateY(-2px); }
+        .btn:not(.btn-red):not(.btn-green):not(.btn-ghost):hover { box-shadow: 0 14px 32px -8px rgba(99, 102, 241, 0.9); }
+        .btn-red:hover { box-shadow: 0 10px 24px -6px rgba(239, 68, 68, 0.5); }
+        .btn-green:hover { box-shadow: 0 10px 24px -6px rgba(16, 185, 129, 0.6); }
+        .btn-ghost:hover { box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.4); }
+        .btn:active { transform: translateY(0) scale(0.96); }
+
+        .topbar .user-chip {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .topbar-exit { transition: all 0.25s ease; }
+        .topbar-exit:hover { box-shadow: 0 6px 16px -4px rgba(239, 68, 68, 0.4); }
+        .topbar-exit:active { transform: scale(0.96); }
+
+        input[type="text"], input[type="url"], input[type="password"], input[type="number"], input[type="datetime-local"], select, textarea {
+            background: rgba(0, 0, 0, 0.4);
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22), 0 0 18px rgba(99, 102, 241, 0.25);
+        }
+
+        .list-item {
+            background: rgba(26, 34, 52, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+            animation: rise 0.45s ease both;
+        }
+        .list-item:nth-child(2) { animation-delay: 0.05s; }
+        .list-item:nth-child(3) { animation-delay: 0.1s; }
+        .list-item:nth-child(4) { animation-delay: 0.15s; }
+        .list-item:nth-child(5) { animation-delay: 0.2s; }
+        .list-item:nth-child(6) { animation-delay: 0.25s; }
+        .list-item:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.15);
+        }
+        .list-item:active { transform: scale(0.985); }
+
+        .stat-card {
+            background: rgba(17, 24, 39, 0.72);
+            backdrop-filter: blur(14px) saturate(150%);
+            -webkit-backdrop-filter: blur(14px) saturate(150%);
+            transition: all 0.25s ease;
+            animation: rise 0.45s ease both;
+        }
+        .stat-card:hover { transform: translateY(-3px); border-color: rgba(99, 102, 241, 0.4); box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.6); }
+
+        .modal {
+            background: rgba(17, 24, 39, 0.92);
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8);
+            animation: modalIn 0.28s ease both;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-overlay.show { animation: fadeIn 0.25s ease both; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .toast {
+            animation: toastIn 0.35s ease both;
+            box-shadow: 0 14px 40px -8px rgba(16, 185, 129, 0.5);
+        }
+        .toast.error { box-shadow: 0 14px 40px -8px rgba(239, 68, 68, 0.5); }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        ::selection { background: rgba(99, 102, 241, 0.4); }
+        ::-webkit-scrollbar { width: 9px; height: 9px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.35); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.55); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+            "firebase/analytics": "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js",
+            "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+            "firebase/database": "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+        }
+    }
+    </script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="icon">🛡️</div>
+            <div>
+                <div class="name">PRINCE HACKS</div>
+                <div class="role">Admin Panel</div>
+            </div>
+        </div>
+
+        <div class="nav-item" data-view="overview"><span class="ic">📊</span><span class="txt">Overview</span></div>
+        <div class="nav-item" data-view="keys"><span class="ic">🔑</span><span class="txt">User Keys</span></div>
+        <div class="nav-item" data-view="categories"><span class="ic">🗂️</span><span class="txt">Categories</span></div>
+        <div class="nav-item" data-view="posts"><span class="ic">📦</span><span class="txt">Posts</span></div>
+        <div class="nav-item active" data-view="settings"><span class="ic">⚙️</span><span class="txt">Settings</span></div>
+
+        <button class="logout" id="logoutBtn">LOGOUT</button>
+    </aside>
+
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="m-item" data-view="overview"><span class="ic">📊</span>Home</div>
+        <div class="m-item" data-view="keys"><span class="ic">🔑</span>Keys</div>
+        <div class="m-item" data-view="categories"><span class="ic">🗂️</span>Cats</div>
+        <div class="m-item" data-view="posts"><span class="ic">📦</span>Posts</div>
+        <div class="m-item active" data-view="settings"><span class="ic">⚙️</span>Settings</div>
+    </nav>
+
+    <div class="main">
+        <div class="topbar">
+            <h1 id="pageTitle">Settings</h1>
+            <div class="topbar-right">
+                <div class="user-chip" id="adminEmail">Admin</div>
+                <button class="topbar-exit" onclick="document.getElementById('logoutBtn').click()">🚪 EXIT</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Site Settings</h3>
+            <div class="form-row">
+                <div>
+                    <label>Site Title</label>
+                    <input type="text" id="setTitle" placeholder="PRINCE HACKS">
+                </div>
+                <div>
+                    <label>Tagline</label>
+                    <input type="text" id="setTagline" placeholder="Explore the latest posts">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Hero Banner Image URL</label>
+                    <input type="text" id="setHero" placeholder="https://...">
+                    <div class="field-hint">Best size: <b>1200 × 500</b> px (wide banner photo)</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Telegram Link</label>
+                    <input type="text" id="setTg" placeholder="https://t.me/...">
+                </div>
+                <div>
+                    <label>WhatsApp Link</label>
+                    <input type="text" id="setWa" placeholder="https://whatsapp.com/channel/...">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Find Password Button Link</label>
+                    <input type="text" id="setFindPass" placeholder="https://...">
+                </div>
+                <div>
+                    <label>Setup Video Link (YouTube)</label>
+                    <input type="text" id="setSetupVideo" placeholder="https://youtube.com/watch?v=...">
+                </div>
+            </div>
+            <button class="btn" onclick="saveSiteSettings()">SAVE SETTINGS</button>
+        </div>
+
+        <div class="card">
+            <h3>Maintenance Mode</h3>
+            <div class="form-row">
+                <div>
+                    <label>Status</label>
+                    <div class="switch-row">
+                        <label class="switch">
+                            <input type="checkbox" id="setMaintenance">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="switch-status" id="maintenanceStatusText">OFF</span>
+                    </div>
+                </div>
+                <div>
+                    <label>Maintenance Heading / Text</label>
+                    <input type="text" id="setMaintText" placeholder="We are under maintenance, please try again later...">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Button Label</label>
+                    <input type="text" id="setMaintLinkLabel" placeholder="e.g. CONTACT ADMIN">
+                </div>
+                <div>
+                    <label>Button Link</label>
+                    <input type="text" id="setMaintLink" placeholder="https://t.me/...">
+                </div>
+            </div>
+            <button class="btn" onclick="saveMaintenance()">SAVE MAINTENANCE</button>
+        </div>
+
+        <div class="card">
+            <h3>Subscribe / Join Popup</h3>
+            <div class="form-row">
+                <div>
+                    <label>Popup Enabled</label>
+                    <div class="switch-row">
+                        <label class="switch">
+                            <input type="checkbox" id="setPopupEnabled">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="switch-status" id="popupStatusText">OFF</span>
+                    </div>
+                </div>
+                <div>
+                    <label>Popup Title</label>
+                    <input type="text" id="setPopupTitle" placeholder="JOIN OUR COMMUNITY">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Popup Text</label>
+                    <input type="text" id="setPopupText" placeholder="Subscribe and join us to get latest updates!">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Button Label</label>
+                    <input type="text" id="setPopupBtnLabel" placeholder="e.g. SUBSCRIBE / JOIN">
+                </div>
+                <div>
+                    <label>Button Link</label>
+                    <input type="text" id="setPopupBtnLink" placeholder="https://t.me/...">
+                </div>
+            </div>
+            <button class="btn" onclick="savePopupSettings()">SAVE POPUP</button>
+        </div>
+
+        <div class="card">
+            <h3>Force Subscribe / Redirect</h3>
+            <div class="form-row">
+                <div>
+                    <label>Force Redirect Enabled</label>
+                    <div class="switch-row">
+                        <label class="switch">
+                            <input type="checkbox" id="setForceRedirectEnabled">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="switch-status" id="forceRedirectStatusText">OFF</span>
+                    </div>
+                    <div class="field-hint">When <b>ON</b>, every time the user opens the app it will automatically jump to the link below — no tap needed.</div>
+                </div>
+                <div>
+                    <label>Redirect Link</label>
+                    <input type="text" id="setForceRedirectLink" placeholder="https://t.me/...">
+                </div>
+            </div>
+            <button class="btn" onclick="saveForceRedirect()">SAVE FORCE REDIRECT</button>
+        </div>
+
+        <div class="card">
+            <div class="theme-head">
+                <div class="t-icon">🎨</div>
+                <h3>Theme Colors</h3>
+                <span class="theme-live">● LIVE</span>
+            </div>
+            <p class="card-sub">Colors <b>real-time</b> Android app me apply hote hain — login screen, dashboard, cards aur buttons. Save dabate hi user app me dikh jayega.</p>
+
+            <div class="theme-layout">
+                <div class="theme-left">
+                <div class="theme-pickers">
+                    <label>Colors</label>
+                    <div class="swatch-grid">
+                        <div class="swatch">
+                            <label class="swatch-btn" title="Choose color">
+                                <input type="color" id="setBg" value="#0b061f">
+                                <span class="swatch-fill" id="setBgSwatch"></span>
+                            </label>
+                            <div class="swatch-info"><span class="swatch-name">Background</span><button class="swatch-hex" id="setBgHex" type="button" title="Copy hex">#0b061f</button></div>
+                        </div>
+                        <div class="swatch">
+                            <label class="swatch-btn" title="Choose color">
+                                <input type="color" id="setCard" value="#140b2b">
+                                <span class="swatch-fill" id="setCardSwatch"></span>
+                            </label>
+                            <div class="swatch-info"><span class="swatch-name">Card</span><button class="swatch-hex" id="setCardHex" type="button" title="Copy hex">#140b2b</button></div>
+                        </div>
+                        <div class="swatch">
+                            <label class="swatch-btn" title="Choose color">
+                                <input type="color" id="setGlow" value="#bd00ff">
+                                <span class="swatch-fill" id="setGlowSwatch"></span>
+                            </label>
+                            <div class="swatch-info"><span class="swatch-name">Glow / Border</span><button class="swatch-hex" id="setGlowHex" type="button" title="Copy hex">#bd00ff</button></div>
+                        </div>
+                        <div class="swatch">
+                            <label class="swatch-btn" title="Choose color">
+                                <input type="color" id="setBtn" value="#ff0080">
+                                <span class="swatch-fill" id="setBtnSwatch"></span>
+                            </label>
+                            <div class="swatch-info"><span class="swatch-name">Button</span><button class="swatch-hex" id="setBtnHex" type="button" title="Copy hex">#ff0080</button></div>
+                        </div>
+                        <div class="swatch">
+                            <label class="swatch-btn" title="Choose color">
+                                <input type="color" id="setAccent" value="#7928ca">
+                                <span class="swatch-fill" id="setAccentSwatch"></span>
+                            </label>
+                            <div class="swatch-info"><span class="swatch-name">Accent</span><button class="swatch-hex" id="setAccentHex" type="button" title="Copy hex">#7928ca</button></div>
+                        </div>
+                        <div class="swatch">
+                            <label class="swatch-btn" title="Choose color">
+                                <input type="color" id="setMuted" value="#b4b1cc">
+                                <span class="swatch-fill" id="setMutedSwatch"></span>
+                            </label>
+                            <div class="swatch-info"><span class="swatch-name">Muted Text</span><button class="swatch-hex" id="setMutedHex" type="button" title="Copy hex">#b4b1cc</button></div>
+                        </div>
+                        <div class="swatch">
+                            <label class="swatch-btn" title="Choose color">
+                                <input type="color" id="setMutedDeep" value="#8c87ab">
+                                <span class="swatch-fill" id="setMutedDeepSwatch"></span>
+                            </label>
+                            <div class="swatch-info"><span class="swatch-name">Muted Deep</span><button class="swatch-hex" id="setMutedDeepHex" type="button" title="Copy hex">#8c87ab</button></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theme-presets">
+                    <label>Quick Presets</label>
+                        <div class="preset-grid">
+                            <button class="preset" data-preset="cyber" onclick="applyPreset('cyber')">
+                                <span class="preset-dots"><i style="background:#bd00ff"></i><i style="background:#ff0080"></i><i style="background:#7928ca"></i></span>
+                                <span class="preset-name">Cyber</span>
+                            </button>
+                            <button class="preset" data-preset="ocean" onclick="applyPreset('ocean')">
+                                <span class="preset-dots"><i style="background:#00c2ff"></i><i style="background:#00b3ff"></i><i style="background:#3a7bd5"></i></span>
+                                <span class="preset-name">Ocean</span>
+                            </button>
+                            <button class="preset" data-preset="matrix" onclick="applyPreset('matrix')">
+                                <span class="preset-dots"><i style="background:#00ff7f"></i><i style="background:#00e676"></i><i style="background:#00c853"></i></span>
+                                <span class="preset-name">Matrix</span>
+                            </button>
+                            <button class="preset" data-preset="royal" onclick="applyPreset('royal')">
+                                <span class="preset-dots"><i style="background:#8a2be2"></i><i style="background:#c084fc"></i><i style="background:#5b21b6"></i></span>
+                                <span class="preset-name">Royal</span>
+                            </button>
+                            <button class="preset" data-preset="blood" onclick="applyPreset('blood')">
+                                <span class="preset-dots"><i style="background:#ff2040"></i><i style="background:#ff3355"></i><i style="background:#ff5c00"></i></span>
+                                <span class="preset-name">Blood</span>
+                            </button>
+                            <button class="preset" data-preset="" onclick="setPresetActive(null)">
+                                <span class="preset-dots single"><i style="background:conic-gradient(#ff0080,#bd00ff,#00c2ff,#00ff7f,#ff2040,#ff0080)"></i></span>
+                                <span class="preset-name">Custom</span>
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="theme-preview">
+                        <label>App Preview</label>
+                        <div class="phone-wrap">
+                            <div class="phone">
+                                <div class="phone-screen" id="themePreview">
+                                    <div class="pv-status">
+                                        <span class="pv-time">9:41</span>
+                                        <div class="pv-right">
+                                            <span class="pv-signal"><i></i><i></i><i></i></span>
+                                            <span class="pv-batt"><i id="pvBattFill"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="pv-body">
+                                        <div class="pv-title" id="pvTitle">PRINCE HACKS</div>
+                                        <div class="pv-sub" id="pvSub">Access dashboard with valid key</div>
+                                        <div class="pv-card" id="pvCard">
+                                            <div class="pv-klabel" id="pvLabel">YOUR KEY</div>
+                                            <div class="pv-field" id="pvField"></div>
+                                            <div class="pv-btn" id="pvBtn">LOGIN</div>
+                                        </div>
+                                        <div class="pv-cats">
+                                            <div class="pv-cat" id="pvCat1"><span class="pv-catbar"></span><span class="pv-catbar grad"></span></div>
+                                            <div class="pv-cat" id="pvCat2"><span class="pv-catbar"></span><span class="pv-catbar grad"></span></div>
+                                            <div class="pv-cat" id="pvCat3"><span class="pv-catbar"></span><span class="pv-catbar grad"></span></div>
+                                            <div class="pv-cat" id="pvCat4"><span class="pv-catbar"></span><span class="pv-catbar grad"></span></div>
+                                        </div>
+                                    </div>
+                                    <div class="pv-home"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <div class="theme-actions">
+                <button class="btn" onclick="saveThemeColors()">💾 SAVE THEME</button>
+                <button class="btn btn-outline" onclick="revertThemeColors()">↺ REVERT</button>
+                <button class="btn btn-red btn-small" onclick="resetThemeColors()">RESET DEFAULTS</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged, signOut } from "firebase/auth";
+        import { ref, get, update } from "firebase/database";
+
+        window.auth = auth;
+        window.db = db;
+        window.signOut = signOut;
+        window.ref = ref;
+        window.get = get;
+        window.update = update;
+
+        function applyAdminChip() {
+            const el = document.getElementById("adminEmail");
+            const isMobile = window.matchMedia("(max-width: 900px)").matches || window.matchMedia("(pointer: coarse)").matches;
+            el.innerText = isMobile ? "Admin" : (window.adminEmailAddr || "");
+        }
+        window.applyAdminChip = applyAdminChip;
+        window.addEventListener("resize", applyAdminChip);
+
+        onAuthStateChanged(auth, function(user) {
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+            window.adminEmailAddr = user.email;
+            applyAdminChip();
+            loadSiteSettings();
+        });
+
+        document.getElementById("logoutBtn").addEventListener("click", function() {
+            signOut(auth).then(function() {
+                sessionStorage.removeItem("adminLoggedIn");
+                window.location.href = "index.html";
+            });
+        });
+
+        document.querySelectorAll(".nav-item, .m-item").forEach(function(item) {
+            item.addEventListener("click", function() {
+                var view = item.dataset.view;
+                if (view === "logout") {
+                    document.getElementById("logoutBtn").click();
+                    return;
+                }
+                if (view === "settings") return;
+                if (view === "posts") {
+                    window.location.href = "posts.html";
+                    return;
+                }
+                if (view === "categories") {
+                    window.location.href = "categories.html";
+                    return;
+                }
+                if (view === "keys") {
+                    window.location.href = "keys.html";
+                    return;
+                }
+                window.location.href = "dashboard.html?view=" + view;
+            });
+        });
+
+        function showToast(msg, isError) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.className = "toast" + (isError ? " error" : "");
+            toast.style.display = "block";
+            setTimeout(function() { toast.style.display = "none"; }, 2500);
+        }
+        window.showToast = showToast;
+
+        function loadSiteSettings() {
+            get(ref(db, "siteSettings")).then(function(snap) {
+                if (!snap.exists()) return;
+                const s = snap.val();
+                if (s.title) document.getElementById("setTitle").value = s.title;
+                if (s.tagline) document.getElementById("setTagline").value = s.tagline;
+                if (s.heroImage) document.getElementById("setHero").value = s.heroImage;
+                if (s.tgLink) document.getElementById("setTg").value = s.tgLink;
+                if (s.waLink) document.getElementById("setWa").value = s.waLink;
+                if (s.findPassLink) document.getElementById("setFindPass").value = s.findPassLink;
+                if (s.setupVideoLink) document.getElementById("setSetupVideo").value = s.setupVideoLink;
+                if (s.bgColor) document.getElementById("setBg").value = s.bgColor;
+                if (s.cardColor) document.getElementById("setCard").value = s.cardColor;
+                if (s.glowColor) document.getElementById("setGlow").value = s.glowColor;
+                if (s.btnColor) document.getElementById("setBtn").value = s.btnColor;
+                if (s.accentColor) document.getElementById("setAccent").value = s.accentColor;
+                if (s.mutedColor) document.getElementById("setMuted").value = s.mutedColor;
+                if (s.mutedDeepColor) document.getElementById("setMutedDeep").value = s.mutedDeepColor;
+                themePreviewUpdate();
+                savedTheme = readThemeInputs();
+                if (typeof s.maintenance === "boolean") {
+                    document.getElementById("setMaintenance").checked = s.maintenance;
+                    document.getElementById("maintenanceStatusText").innerText = s.maintenance ? "ON" : "OFF";
+                }
+                if (s.maintenanceText) document.getElementById("setMaintText").value = s.maintenanceText;
+                if (s.maintenanceLinkLabel) document.getElementById("setMaintLinkLabel").value = s.maintenanceLinkLabel;
+                if (s.maintenanceLink) document.getElementById("setMaintLink").value = s.maintenanceLink;
+                if (typeof s.popupEnabled === "boolean") {
+                    document.getElementById("setPopupEnabled").checked = s.popupEnabled;
+                    document.getElementById("popupStatusText").innerText = s.popupEnabled ? "ON" : "OFF";
+                }
+                if (s.popupTitle) document.getElementById("setPopupTitle").value = s.popupTitle;
+                if (s.popupText) document.getElementById("setPopupText").value = s.popupText;
+                if (s.popupBtnLabel) document.getElementById("setPopupBtnLabel").value = s.popupBtnLabel;
+                if (s.popupBtnLink) document.getElementById("setPopupBtnLink").value = s.popupBtnLink;
+                if (typeof s.forceRedirectEnabled === "boolean") {
+                    document.getElementById("setForceRedirectEnabled").checked = s.forceRedirectEnabled;
+                    document.getElementById("forceRedirectStatusText").innerText = s.forceRedirectEnabled ? "ON" : "OFF";
+                }
+                if (s.forceRedirectLink) document.getElementById("setForceRedirectLink").value = s.forceRedirectLink;
+            }).catch(function() { });
+        }
+        window.loadSiteSettings = loadSiteSettings;
+
+        function saveSiteSettings() {
+            const data = {
+                title: document.getElementById("setTitle").value.trim(),
+                tagline: document.getElementById("setTagline").value.trim(),
+                heroImage: document.getElementById("setHero").value.trim(),
+                tgLink: document.getElementById("setTg").value.trim(),
+                waLink: document.getElementById("setWa").value.trim(),
+                findPassLink: document.getElementById("setFindPass").value.trim(),
+                setupVideoLink: document.getElementById("setSetupVideo").value.trim()
+            };
+            update(ref(db, "siteSettings"), data).then(function() {
+                showToast("Site settings saved!");
+            }).catch(function() { showToast("Error saving settings!", true); });
+        }
+        window.saveSiteSettings = saveSiteSettings;
+
+        function saveMaintenance() {
+            const data = {
+                maintenance: document.getElementById("setMaintenance").checked,
+                maintenanceText: document.getElementById("setMaintText").value.trim(),
+                maintenanceLinkLabel: document.getElementById("setMaintLinkLabel").value.trim(),
+                maintenanceLink: document.getElementById("setMaintLink").value.trim()
+            };
+            update(ref(db, "siteSettings"), data).then(function() {
+                document.getElementById("maintenanceStatusText").innerText = data.maintenance ? "ON" : "OFF";
+                showToast(data.maintenance ? "Maintenance mode ON!" : "Maintenance mode OFF!");
+            }).catch(function() { showToast("Error saving maintenance!", true); });
+        }
+        window.saveMaintenance = saveMaintenance;
+
+        function savePopupSettings() {
+            const data = {
+                popupEnabled: document.getElementById("setPopupEnabled").checked,
+                popupTitle: document.getElementById("setPopupTitle").value.trim(),
+                popupText: document.getElementById("setPopupText").value.trim(),
+                popupBtnLabel: document.getElementById("setPopupBtnLabel").value.trim(),
+                popupBtnLink: document.getElementById("setPopupBtnLink").value.trim()
+            };
+            update(ref(db, "siteSettings"), data).then(function() {
+                document.getElementById("popupStatusText").innerText = data.popupEnabled ? "ON" : "OFF";
+                showToast(data.popupEnabled ? "Popup enabled!" : "Popup disabled!");
+            }).catch(function() { showToast("Error saving popup!", true); });
+        }
+        window.savePopupSettings = savePopupSettings;
+
+        function saveForceRedirect() {
+            const data = {
+                forceRedirectEnabled: document.getElementById("setForceRedirectEnabled").checked,
+                forceRedirectLink: document.getElementById("setForceRedirectLink").value.trim()
+            };
+            update(ref(db, "siteSettings"), data).then(function() {
+                document.getElementById("forceRedirectStatusText").innerText = data.forceRedirectEnabled ? "ON" : "OFF";
+                showToast(data.forceRedirectEnabled ? "Force redirect enabled!" : "Force redirect disabled!");
+            }).catch(function() { showToast("Error saving force redirect!", true); });
+        }
+        window.saveForceRedirect = saveForceRedirect;
+
+        const THEME_PRESETS = {
+            cyber: { bg: "#0b061f", card: "#140b2b", glow: "#bd00ff", btn: "#ff0080", accent: "#7928ca", muted: "#b4b1cc", mutedDeep: "#8c87ab" },
+            ocean: { bg: "#04101f", card: "#0a2038", glow: "#00c2ff", btn: "#00b3ff", accent: "#3a7bd5", muted: "#a9c7e8", mutedDeep: "#7a9cc0" },
+            matrix: { bg: "#051607", card: "#0b2410", glow: "#00ff7f", btn: "#00e676", accent: "#00c853", muted: "#a5e6bf", mutedDeep: "#74b88f" },
+            royal: { bg: "#12062e", card: "#1d0a45", glow: "#8a2be2", btn: "#c084fc", accent: "#5b21b6", muted: "#d5c4ff", mutedDeep: "#a98ff5" },
+            blood: { bg: "#1f050a", card: "#2d0a12", glow: "#ff2040", btn: "#ff3355", accent: "#ff5c00", muted: "#ffb3bd", mutedDeep: "#d97d88" }
+        };
+
+        var savedTheme = null;
+        var currentPreset = null;
+
+        function themeHex(id, fallback) {
+            const el = document.getElementById(id);
+            return el ? el.value : fallback;
+        }
+
+        function readThemeInputs() {
+            return {
+                bgColor: themeHex("setBg", "#0b061f"),
+                cardColor: themeHex("setCard", "#140b2b"),
+                glowColor: themeHex("setGlow", "#bd00ff"),
+                btnColor: themeHex("setBtn", "#ff0080"),
+                accentColor: themeHex("setAccent", "#7928ca"),
+                mutedColor: themeHex("setMuted", "#b4b1cc"),
+                mutedDeepColor: themeHex("setMutedDeep", "#8c87ab")
+            };
+        }
+
+        function setThemeInputs(t) {
+            document.getElementById("setBg").value = t.bgColor;
+            document.getElementById("setCard").value = t.cardColor;
+            document.getElementById("setGlow").value = t.glowColor;
+            document.getElementById("setBtn").value = t.btnColor;
+            document.getElementById("setAccent").value = t.accentColor;
+            document.getElementById("setMuted").value = t.mutedColor;
+            document.getElementById("setMutedDeep").value = t.mutedDeepColor;
+            themePreviewUpdate();
+        }
+
+        function setPresetActive(name) {
+            currentPreset = name;
+            document.querySelectorAll(".preset").forEach(function(p) {
+                p.classList.toggle("preset-active", p.dataset.preset === name);
+            });
+        }
+        window.setPresetActive = setPresetActive;
+
+        function themePreviewUpdate() {
+            const bg = themeHex("setBg", "#0b061f");
+            const card = themeHex("setCard", "#140b2b");
+            const glow = themeHex("setGlow", "#bd00ff");
+            const btn = themeHex("setBtn", "#ff0080");
+            const accent = themeHex("setAccent", "#7928ca");
+            const muted = themeHex("setMuted", "#b4b1cc");
+            const mutedDeep = themeHex("setMutedDeep", "#8c87ab");
+
+            const swatches = { setBg: bg, setCard: card, setGlow: glow, setBtn: btn, setAccent: accent, setMuted: muted, setMutedDeep: mutedDeep };
+            Object.keys(swatches).forEach(function(id) {
+                const sw = document.getElementById(id + "Swatch");
+                const hex = document.getElementById(id + "Hex");
+                if (sw) sw.style.background = swatches[id];
+                if (hex) hex.textContent = swatches[id];
+            });
+
+            const pv = document.getElementById("themePreview");
+            if (!pv) return;
+            pv.style.background = bg;
+            const title = document.getElementById("pvTitle");
+            if (title) title.style.backgroundImage = "linear-gradient(90deg, #fff, " + btn + ")";
+            const sub = document.getElementById("pvSub");
+            if (sub) sub.style.color = muted;
+            const label = document.getElementById("pvLabel");
+            if (label) label.style.color = mutedDeep;
+            const batt = document.getElementById("pvBattFill");
+            if (batt) batt.style.background = btn;
+            const cardEl = document.getElementById("pvCard");
+            if (cardEl) { cardEl.style.background = card; cardEl.style.borderColor = glow; }
+            const field = document.getElementById("pvField");
+            if (field) field.style.borderColor = glow;
+            const btnEl = document.getElementById("pvBtn");
+            if (btnEl) btnEl.style.background = "linear-gradient(90deg, " + accent + ", " + btn + ")";
+            pv.querySelectorAll(".pv-cat").forEach(function(c) {
+                c.style.background = card;
+                c.style.borderColor = glow;
+                c.querySelectorAll(".pv-catbar.grad").forEach(function(g) {
+                    g.style.background = "linear-gradient(90deg, " + accent + ", " + btn + ")";
+                });
+            });
+        }
+        window.themePreviewUpdate = themePreviewUpdate;
+
+        document.querySelectorAll(".swatch-hex").forEach(function(hexEl) {
+            hexEl.addEventListener("click", function() {
+                const v = hexEl.textContent.trim();
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(v).then(function() {
+                        showToast("Copied " + v);
+                    }).catch(function() { showToast("Copied " + v); });
+                } else {
+                    showToast("Copied " + v);
+                }
+            });
+        });
+
+        function applyPreset(name) {
+            const p = THEME_PRESETS[name];
+            if (!p) return;
+            setThemeInputs({
+                bgColor: p.bg,
+                cardColor: p.card,
+                glowColor: p.glow,
+                btnColor: p.btn,
+                accentColor: p.accent,
+                mutedColor: p.muted,
+                mutedDeepColor: p.mutedDeep
+            });
+            setPresetActive(name);
+        }
+        window.applyPreset = applyPreset;
+
+        function saveThemeColors() {
+            update(ref(db, "siteSettings"), readThemeInputs()).then(function() {
+                savedTheme = readThemeInputs();
+                showToast("Theme saved! App me turant apply ho jayega.");
+            }).catch(function() { showToast("Error saving colors!", true); });
+        }
+        window.saveThemeColors = saveThemeColors;
+
+        function revertThemeColors() {
+            if (!savedTheme) {
+                showToast("No saved theme yet.", true);
+                return;
+            }
+            setThemeInputs(savedTheme);
+            setPresetActive(null);
+        }
+        window.revertThemeColors = revertThemeColors;
+
+        function resetThemeColors() {
+            const p = THEME_PRESETS.cyber;
+            setThemeInputs({
+                bgColor: p.bg,
+                cardColor: p.card,
+                glowColor: p.glow,
+                btnColor: p.btn,
+                accentColor: p.accent,
+                mutedColor: p.muted,
+                mutedDeepColor: p.mutedDeep
+            });
+            setPresetActive("cyber");
+            const updates = {
+                bgColor: null,
+                cardColor: null,
+                glowColor: null,
+                btnColor: null,
+                accentColor: null,
+                mutedColor: null,
+                mutedDeepColor: null
+            };
+            update(ref(db, "siteSettings"), updates).then(function() {
+                savedTheme = readThemeInputs();
+                showToast("Theme reset to default!");
+            }).catch(function() { showToast("Error resetting colors!", true); });
+        }
+        window.resetThemeColors = resetThemeColors;
+
+        document.querySelectorAll("#setBg,#setCard,#setGlow,#setBtn,#setAccent,#setMuted,#setMutedDeep").forEach(function(el) {
+            el.addEventListener("input", function() {
+                setPresetActive(null);
+                themePreviewUpdate();
+            });
+        });
+
+        document.getElementById("setMaintenance").addEventListener("change", function() {
+            document.getElementById("maintenanceStatusText").innerText = this.checked ? "ON" : "OFF";
+        });
+        document.getElementById("setPopupEnabled").addEventListener("change", function() {
+            document.getElementById("popupStatusText").innerText = this.checked ? "ON" : "OFF";
+        });
+        document.getElementById("setForceRedirectEnabled").addEventListener("change", function() {
+            document.getElementById("forceRedirectStatusText").innerText = this.checked ? "ON" : "OFF";
+        });
+    </script>
+</body>
+</html>

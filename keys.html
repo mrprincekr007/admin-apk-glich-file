@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USER KEYS - ADMIN PANEL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        *,
+        *::before,
+        *::after {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        :focus { outline: none; }
+
+        :root {
+            --bg: #0a0f1e;
+            --panel: #111827;
+            --panel-2: #1a2234;
+            --border: rgba(99, 102, 241, 0.18);
+            --accent: #6366f1;
+            --accent-2: #ec4899;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --green: #10b981;
+            --red: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px 18px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+        }
+
+        .sidebar .logo .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sidebar .logo .name {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .sidebar .logo .role {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            user-select: none;
+        }
+
+        .nav-item:hover { background: var(--panel-2); color: var(--text); }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));
+            color: #fff;
+            border: 1px solid var(--border);
+        }
+
+        .nav-item .ic { font-size: 16px; width: 22px; text-align: center; }
+
+        .sidebar .logout {
+            margin-top: auto;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--red);
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .sidebar .logout:hover { background: rgba(239, 68, 68, 0.2); }
+
+        .main {
+            margin-left: 230px;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .topbar h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .topbar .user-chip {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 9px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .topbar-exit {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--red);
+            border-radius: 12px;
+            padding: 9px 14px;
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .topbar-exit:hover { background: rgba(239, 68, 68, 0.2); }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card h3 {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        input[type="text"], input[type="url"], input[type="password"], input[type="number"], input[type="datetime-local"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .field-hint {
+            margin-top: 6px;
+            font-size: 11px;
+            color: #8a85b0;
+            line-height: 1.4;
+        }
+
+        .field-hint b { color: #ff0080; font-weight: 700; }
+
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .cs-trigger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 13px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .cs-trigger:hover { border-color: rgba(99, 102, 241, 0.5); }
+
+        .cs-trigger .cs-value {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .cs-trigger .cs-arrow {
+            color: var(--accent);
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .custom-select.open .cs-trigger {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .custom-select.open .cs-arrow {
+            transform: rotate(180deg);
+        }
+
+        .cs-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 6px;
+            z-index: 30;
+            max-height: 260px;
+            overflow-y: auto;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+        }
+
+        .custom-select.open .cs-menu {
+            display: block;
+            animation: csIn 0.18s ease-out;
+        }
+
+        .custom-select.open { z-index: 60; }
+        .card:has(.custom-select.open) { position: relative; z-index: 6; }
+
+        @keyframes csIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cs-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.15s;
+            border: 1px solid transparent;
+        }
+
+        .cs-option:hover { background: rgba(99, 102, 241, 0.12); }
+        .cs-option.selected {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));
+            border-color: var(--border);
+            color: #fff;
+        }
+
+        .cs-option .cs-opt-icon { font-size: 16px; width: 22px; text-align: center; }
+        .cs-option .cs-opt-name { flex: 1; }
+        .cs-option .cs-opt-check { color: var(--green); font-weight: 900; }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-green { background: var(--green); box-shadow: none; }
+        .btn-red { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .btn-small { padding: 8px 14px; font-size: 11px; }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: var(--panel-2);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+        }
+
+        .list-item .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .list-item .info .thumb {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .list-item .info .t1 { font-size: 13px; font-weight: 700; color: #fff; }
+        .list-item .info .t2 { font-size: 11px; color: var(--muted); }
+
+        .actions { display: flex; gap: 8px; }
+
+        .key-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .key-status.key-good {
+            color: var(--green);
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .key-status.key-bad {
+            color: var(--red);
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .key-expiry { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+        .empty-state {
+            color: var(--muted);
+            font-size: 13px;
+            text-align: center;
+            padding: 30px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 {
+            font-size: 15px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--green);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .toast.error { background: var(--red); }
+
+        .mobile-nav {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { width: 72px; padding: 14px 8px; }
+            .sidebar .logo .name, .sidebar .logo .role, .nav-item span.txt { display: none; }
+            .nav-item { justify-content: center; }
+            .nav-item .ic { width: auto; font-size: 18px; }
+            .sidebar .logout { font-size: 11px; padding: 10px 4px; }
+            .main { margin-left: 72px; padding: 16px; }
+            .topbar-exit { display: block; }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 14px 12px 120px; }
+            .mobile-nav {
+                display: flex;
+                position: fixed;
+                bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+                left: 14px;
+                right: 14px;
+                padding: 6px 8px;
+                background: rgba(22, 28, 46, 0.55);
+                backdrop-filter: blur(24px) saturate(180%);
+                -webkit-backdrop-filter: blur(24px) saturate(180%);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                border-radius: 28px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+                z-index: 40;
+                justify-content: space-around;
+            }
+
+            .mobile-nav .m-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                flex: 1;
+                max-width: 84px;
+                padding: 7px 6px 6px;
+                border-radius: 18px;
+                font-size: 9.5px;
+                font-weight: 700;
+                color: var(--muted);
+                cursor: pointer;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                user-select: none;
+                transition: all 0.25s ease;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .mobile-nav .m-item .ic {
+                font-size: 20px;
+                line-height: 1;
+                filter: grayscale(0.5) brightness(0.85);
+                transition: all 0.25s ease;
+            }
+
+            .mobile-nav .m-item.active {
+                color: #fff;
+                background: linear-gradient(135deg, #6366f1, #ec4899);
+                box-shadow: 0 6px 16px -2px rgba(99, 102, 241, 0.5), 0 2px 6px -1px rgba(236, 72, 153, 0.4);
+            }
+
+            .mobile-nav .m-item.active .ic {
+                filter: none;
+                transform: scale(1.08);
+            }
+
+            .mobile-nav .m-item:active { transform: scale(0.94); }
+
+            .topbar { margin-bottom: 16px; }
+            .topbar h1 { font-size: 16px; }
+            .topbar .user-chip { padding: 7px 12px; font-size: 11px; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .topbar-exit { display: block; padding: 7px 12px; font-size: 10px; }
+
+            .card { padding: 14px; }
+            .card > .btn { width: 100%; padding: 14px; font-size: 13px; }
+            .form-row { grid-template-columns: 1fr; }
+            .list-item { flex-wrap: wrap; padding: 10px 12px; }
+            .list-item .info .thumb { width: 38px; height: 38px; }
+            .actions { width: 100%; justify-content: flex-end; }
+            .actions .btn { flex: 1; }
+        }
+
+        /* ==== UI ENHANCEMENTS: glow / glass / animation / touch ==== */
+        body {
+            background: linear-gradient(135deg, #0a0f1e, #111a33, #0a0f1e, #141a35, #0d1428);
+            background-size: 300% 300%;
+            animation: bgShift 20s ease infinite;
+        }
+        @keyframes bgShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 480px;
+            height: 480px;
+            border-radius: 50%;
+            filter: blur(130px);
+            opacity: 0.22;
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::before { top: -140px; left: -140px; background: #6366f1; animation: orbFloat 16s ease-in-out infinite; }
+        body::after { bottom: -160px; right: -120px; background: #ec4899; animation: orbFloat2 20s ease-in-out infinite; }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 40px) scale(1.15); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-50px, -50px) scale(1.1); }
+        }
+
+        .main { position: relative; z-index: 1; }
+
+        .sidebar {
+            background: rgba(17, 24, 39, 0.78);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            box-shadow: 2px 0 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar .logo .icon {
+            box-shadow: 0 0 22px rgba(99, 102, 241, 0.55);
+            animation: iconPulse 3s ease-in-out infinite;
+        }
+        @keyframes iconPulse {
+            0%, 100% { box-shadow: 0 0 18px rgba(99, 102, 241, 0.45); }
+            50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.6); }
+        }
+
+        .nav-item {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+        .nav-item:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25); }
+        .nav-item.active {
+            box-shadow: 0 4px 18px -2px rgba(99, 102, 241, 0.5);
+            animation: navGlow 2.5s ease-in-out infinite;
+        }
+        @keyframes navGlow {
+            0%, 100% { box-shadow: 0 4px 18px -2px rgba(99, 102, 241, 0.45); }
+            50% { box-shadow: 0 4px 26px -2px rgba(236, 72, 153, 0.55); }
+        }
+        .nav-item:active { transform: scale(0.97); }
+
+        .sidebar .logout { transition: all 0.25s ease; }
+        .sidebar .logout:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -4px rgba(239, 68, 68, 0.5); }
+        .sidebar .logout:active { transform: scale(0.97); }
+
+        .card {
+            background: rgba(17, 24, 39, 0.72);
+            backdrop-filter: blur(14px) saturate(150%);
+            -webkit-backdrop-filter: blur(14px) saturate(150%);
+            border: 1px solid rgba(99, 102, 241, 0.22);
+            box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            animation: rise 0.45s ease both;
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn { transition: all 0.25s ease; }
+        .btn:not(.btn-red):not(.btn-green):not(.btn-ghost) {
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            background-size: 200% 200%;
+            animation: btnShift 6s ease infinite;
+            box-shadow: 0 10px 26px -8px rgba(99, 102, 241, 0.7);
+        }
+        @keyframes btnShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .btn:hover { filter: brightness(1.12); transform: translateY(-2px); }
+        .btn:not(.btn-red):not(.btn-green):not(.btn-ghost):hover { box-shadow: 0 14px 32px -8px rgba(99, 102, 241, 0.9); }
+        .btn-red:hover { box-shadow: 0 10px 24px -6px rgba(239, 68, 68, 0.5); }
+        .btn-green:hover { box-shadow: 0 10px 24px -6px rgba(16, 185, 129, 0.6); }
+        .btn-ghost:hover { box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.4); }
+        .btn:active { transform: translateY(0) scale(0.96); }
+
+        .topbar .user-chip {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .topbar-exit { transition: all 0.25s ease; }
+        .topbar-exit:hover { box-shadow: 0 6px 16px -4px rgba(239, 68, 68, 0.4); }
+        .topbar-exit:active { transform: scale(0.96); }
+
+        input[type="text"], input[type="url"], input[type="password"], input[type="number"], input[type="datetime-local"], select, textarea {
+            background: rgba(0, 0, 0, 0.4);
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22), 0 0 18px rgba(99, 102, 241, 0.25);
+        }
+
+        .list-item {
+            background: rgba(26, 34, 52, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+            animation: rise 0.45s ease both;
+        }
+        .list-item:nth-child(2) { animation-delay: 0.05s; }
+        .list-item:nth-child(3) { animation-delay: 0.1s; }
+        .list-item:nth-child(4) { animation-delay: 0.15s; }
+        .list-item:nth-child(5) { animation-delay: 0.2s; }
+        .list-item:nth-child(6) { animation-delay: 0.25s; }
+        .list-item:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.15);
+        }
+        .list-item:active { transform: scale(0.985); }
+
+        .stat-card {
+            background: rgba(17, 24, 39, 0.72);
+            backdrop-filter: blur(14px) saturate(150%);
+            -webkit-backdrop-filter: blur(14px) saturate(150%);
+            transition: all 0.25s ease;
+            animation: rise 0.45s ease both;
+        }
+        .stat-card:hover { transform: translateY(-3px); border-color: rgba(99, 102, 241, 0.4); box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.6); }
+
+        .modal {
+            background: rgba(17, 24, 39, 0.92);
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8);
+            animation: modalIn 0.28s ease both;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-overlay.show { animation: fadeIn 0.25s ease both; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .toast {
+            animation: toastIn 0.35s ease both;
+            box-shadow: 0 14px 40px -8px rgba(16, 185, 129, 0.5);
+        }
+        .toast.error { box-shadow: 0 14px 40px -8px rgba(239, 68, 68, 0.5); }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        ::selection { background: rgba(99, 102, 241, 0.4); }
+        ::-webkit-scrollbar { width: 9px; height: 9px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.35); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.55); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+            "firebase/analytics": "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js",
+            "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+            "firebase/database": "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+        }
+    }
+    </script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="icon">🛡️</div>
+            <div>
+                <div class="name">PRINCE HACKS</div>
+                <div class="role">Admin Panel</div>
+            </div>
+        </div>
+
+        <div class="nav-item" data-view="overview"><span class="ic">📊</span><span class="txt">Overview</span></div>
+        <div class="nav-item active" data-view="keys"><span class="ic">🔑</span><span class="txt">User Keys</span></div>
+        <div class="nav-item" data-view="categories"><span class="ic">🗂️</span><span class="txt">Categories</span></div>
+        <div class="nav-item" data-view="posts"><span class="ic">📦</span><span class="txt">Posts</span></div>
+        <div class="nav-item" data-view="settings"><span class="ic">⚙️</span><span class="txt">Settings</span></div>
+
+        <button class="logout" id="logoutBtn">LOGOUT</button>
+    </aside>
+
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="m-item" data-view="overview"><span class="ic">📊</span>Home</div>
+        <div class="m-item active" data-view="keys"><span class="ic">🔑</span>Keys</div>
+        <div class="m-item" data-view="categories"><span class="ic">🗂️</span>Cats</div>
+        <div class="m-item" data-view="posts"><span class="ic">📦</span>Posts</div>
+        <div class="m-item" data-view="settings"><span class="ic">⚙️</span>Settings</div>
+    </nav>
+
+    <div class="main">
+        <div class="topbar">
+            <h1 id="pageTitle">User Keys</h1>
+            <div class="topbar-right">
+                <div class="user-chip" id="adminEmail">Admin</div>
+                <button class="topbar-exit" onclick="document.getElementById('logoutBtn').click()">🚪 EXIT</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Add New User Key</h3>
+            <div class="form-row">
+                <div>
+                    <label>Key</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="keyInput" placeholder="e.g. PH-XXXXXX">
+                        <button class="btn btn-small" type="button" onclick="randomKey()" title="Generate random key">🔀</button>
+                    </div>
+                </div>
+                <div>
+                    <label>User Name / Note</label>
+                    <input type="text" id="keyNameInput" placeholder="e.g. Prince">
+                </div>
+                <div>
+                    <label>Type</label>
+                    <select id="keyTypeInput">
+                        <option value="Normal">Normal</option>
+                        <option value="VIP">VIP</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Duration</label>
+                    <div class="custom-select">
+                        <button type="button" class="cs-trigger" onclick="toggleAddDurationDropdown()">
+                            <span class="cs-value" id="addDurationValue">Lifetime</span>
+                            <span class="cs-arrow">▾</span>
+                        </button>
+                        <div class="cs-menu" id="addDurationMenu"></div>
+                    </div>
+                </div>
+                <div id="addDurationCustomWrap" style="display: none;">
+                    <label>Custom Duration (hours)</label>
+                    <input type="number" id="keyDurationCustom" min="1" placeholder="e.g. 48">
+                </div>
+            </div>
+            <button class="btn" onclick="addKey()">Save Key</button>
+        </div>
+
+        <div class="card">
+            <h3 style="display:flex; justify-content:space-between; align-items:center;">Active User Keys
+                <button class="btn btn-small btn-red" onclick="clearExpiredKeys()" title="Delete all expired keys">🧹 Clear Expired</button>
+            </h3>
+            <div id="keysList"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalBody"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged, signOut } from "firebase/auth";
+        import { ref, get, set, update, remove } from "firebase/database";
+
+        window.auth = auth;
+        window.db = db;
+        window.signOut = signOut;
+        window.ref = ref;
+        window.get = get;
+        window.set = set;
+        window.update = update;
+        window.remove = remove;
+
+        function applyAdminChip() {
+            const el = document.getElementById("adminEmail");
+            const isMobile = window.matchMedia("(max-width: 900px)").matches || window.matchMedia("(pointer: coarse)").matches;
+            el.innerText = isMobile ? "Admin" : (window.adminEmailAddr || "");
+        }
+        window.applyAdminChip = applyAdminChip;
+        window.addEventListener("resize", applyAdminChip);
+
+        onAuthStateChanged(auth, function(user) {
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+            window.adminEmailAddr = user.email;
+            applyAdminChip();
+            loadKeys();
+        });
+
+        document.getElementById("logoutBtn").addEventListener("click", function() {
+            signOut(auth).then(function() {
+                sessionStorage.removeItem("adminLoggedIn");
+                window.location.href = "index.html";
+            });
+        });
+
+        document.querySelectorAll(".nav-item, .m-item").forEach(function(item) {
+            item.addEventListener("click", function() {
+                var view = item.dataset.view;
+                if (view === "logout") {
+                    document.getElementById("logoutBtn").click();
+                    return;
+                }
+                if (view === "keys") return;
+                if (view === "categories") {
+                    window.location.href = "categories.html";
+                    return;
+                }
+                if (view === "posts") {
+                    window.location.href = "posts.html";
+                    return;
+                }
+                if (view === "settings") {
+                    window.location.href = "settings.html";
+                    return;
+                }
+                window.location.href = "dashboard.html?view=" + view;
+            });
+        });
+
+        function showToast(msg, isError) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.className = "toast" + (isError ? " error" : "");
+            toast.style.display = "block";
+            setTimeout(function() { toast.style.display = "none"; }, 2500);
+        }
+        window.showToast = showToast;
+
+        function esc(s) {
+            return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+        window.esc = esc;
+
+        function jsStr(s) {
+            return String(s || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+        }
+        window.jsStr = jsStr;
+
+        function loadKeys() {
+            const list = document.getElementById("keysList");
+            list.innerHTML = '<div class="empty-state">Loading...</div>';
+            get(ref(db, "ActiveUserKeys")).then(function(snap) {
+                list.innerHTML = "";
+                if (!snap.exists()) {
+                    list.innerHTML = '<div class="empty-state">No keys yet. Add one above.</div>';
+                    return;
+                }
+                const keys = snap.val();
+                Object.keys(keys).sort().forEach(function(key) {
+                    const data = keys[key] || {};
+                    const banned = !!data.banned;
+                    let statusText, statusCls, expiryText, durationText;
+                    const dur = data.durationHours;
+                    if (dur) {
+                        durationText = (dur === 99999) ? "Lifetime" : (dur + " Hours");
+                        const expired = (dur !== 99999) && (data.createdAt > 0) && Date.now() > (data.createdAt + dur * 3600000);
+                        statusText = banned ? "BANNED" : (expired ? "EXPIRED" : "ACTIVE");
+                        statusCls = (banned || expired) ? "key-bad" : "key-good";
+                        expiryText = (dur === 99999 || data.createdAt <= 0) ? "Lifetime"
+                            : new Date(data.createdAt + dur * 3600000).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+                    } else {
+                        durationText = "";
+                        const expired = data.expiresAt > 0 && Date.now() > data.expiresAt;
+                        statusText = banned ? "BANNED" : (expired ? "EXPIRED" : "ACTIVE");
+                        statusCls = (banned || expired) ? "key-bad" : "key-good";
+                        expiryText = data.expiresAt > 0
+                            ? new Date(data.expiresAt).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+                            : "Never";
+                    }
+                    const type = data.type || "Normal";
+                    const usedText = data.isUsed
+                        ? '<span class="key-status" style="background:rgba(236,72,153,0.12); color:#ec4899; border:1px solid rgba(236,72,153,0.3);">USED</span>'
+                        : '<span class="key-status" style="background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.3);">UNUSED</span>';
+                    const typeText = '<span class="key-status" style="background:rgba(168,85,247,0.12); color:#a855f7; border:1px solid rgba(168,85,247,0.3);">' + esc(type.toUpperCase()) + '</span>';
+                    const boundId = data.boundDeviceId && String(data.boundDeviceId) !== "NONE" && String(data.boundDeviceId) !== "none" ? String(data.boundDeviceId) : "";
+                    const boundMap = data.boundDevices || {};
+                    const boundExtra = [];
+                    Object.keys(boundMap).forEach(function(did) { if (did !== boundId) boundExtra.push(did); });
+                    const boundChips = [];
+                    if (boundId) {
+                        boundChips.push('<span class="key-expiry" style="display:inline-flex; align-items:center; gap:4px; margin-right:8px;" title="' + esc(boundId) + '">📱 ' + esc(boundId.length > 12 ? boundId.slice(0, 12) + "..." : boundId) + '</span>');
+                    }
+                    boundExtra.forEach(function(did) {
+                        boundChips.push('<span class="key-expiry" style="display:inline-flex; align-items:center; gap:4px; margin-right:8px;" title="' + esc(did) + '">📱 ' + esc(did.length > 12 ? did.slice(0, 12) + "..." : did) + '</span>');
+                    });
+                    const unbindButtons = [];
+                    if (boundId) {
+                        unbindButtons.push('<button class="btn btn-small" onclick="unbindDevice(\'' + jsStr(key) + '\',\'' + jsStr(boundId) + '\')">UNBIND</button>');
+                    }
+                    boundExtra.forEach(function(did) {
+                        unbindButtons.push('<button class="btn btn-small" onclick="unbindDevice(\'' + jsStr(key) + '\',\'' + jsStr(did) + '\')">UNBIND</button>');
+                    });
+                    const name = data.note || data.name || "";
+                    const item = document.createElement("div");
+                    item.className = "list-item";
+                    item.innerHTML =
+                        '<div class="info"><div style="font-size: 20px;">🔑</div><div>' +
+                        '<div class="t1">' + esc(key) + '</div>' +
+                        '<div class="t2">' + esc(name || "-") + '</div>' +
+                        '<div style="display:flex; gap:8px; align-items:center; margin-top:4px; flex-wrap:wrap;">' +
+                        '<span class="key-status ' + statusCls + '">' + statusText + '</span>' +
+                        typeText + usedText +
+                        (durationText ? '<span class="key-expiry">⏰ ' + esc(durationText) + '</span>' : '') +
+                        '<span class="key-expiry">Expires: ' + esc(expiryText) + '</span>' +
+                        '</div>' +
+                        (boundChips.length ? '<div style="margin-top:6px;">' + boundChips.join("") + '</div>' : '') +
+                        '</div></div>' +
+                        '<div class="actions">' +
+                        unbindButtons.join("") +
+                        '<button class="btn btn-small ' + (banned ? "btn-green" : "btn-red") + '" onclick="toggleBan(\'' + jsStr(key) + '\')">' + (banned ? "UNBAN" : "BAN") + '</button>' +
+                        '<button class="btn btn-small" onclick="editKey(\'' + jsStr(key) + '\')">EDIT</button>' +
+                        '<button class="btn btn-red btn-small" onclick="deleteKey(\'' + jsStr(key) + '\')">DELETE</button>' +
+                        '</div>';
+                    list.appendChild(item);
+                });
+            }).catch(function() {
+                list.innerHTML = '<div class="empty-state">Error loading keys.</div>';
+            });
+        }
+        window.loadKeys = loadKeys;
+
+        let addDurationState = { mode: "preset", hours: 99999 };
+
+        const KEY_DURATION_OPTIONS = [
+            { hours: 99999, label: "Lifetime" },
+            { hours: 24, label: "24 Hours" },
+            { hours: 48, label: "48 Hours" },
+            { hours: 72, label: "3 Days" },
+            { hours: 168, label: "7 Days" },
+            { hours: 720, label: "30 Days" },
+            { hours: 0, label: "Custom Hours..." }
+        ];
+
+        function toggleAddDurationDropdown() {
+            const menu = document.getElementById("addDurationMenu");
+            const wrap = menu.parentElement;
+            menu.innerHTML = "";
+            KEY_DURATION_OPTIONS.forEach(function(opt) {
+                let isSel;
+                if (opt.hours === 0) {
+                    isSel = addDurationState.mode === "custom";
+                } else {
+                    isSel = addDurationState.mode === "preset" && addDurationState.hours === opt.hours;
+                }
+                const item = document.createElement("div");
+                item.className = "cs-option" + (isSel ? " selected" : "");
+                item.innerHTML =
+                    '<span class="cs-opt-name">' + esc(opt.label) + '</span>' +
+                    '<span class="cs-opt-check">' + (isSel ? "✓" : "") + '</span>';
+                item.addEventListener("click", function() {
+                    if (opt.hours === 0) {
+                        addDurationState = { mode: "custom", hours: 0 };
+                        document.getElementById("keyDurationCustom").focus();
+                    } else {
+                        addDurationState = { mode: "preset", hours: opt.hours };
+                    }
+                    document.getElementById("addDurationValue").innerText = opt.label;
+                    document.getElementById("addDurationCustomWrap").style.display = (opt.hours === 0) ? "block" : "none";
+                    wrap.classList.remove("open");
+                });
+                menu.appendChild(item);
+            });
+            wrap.classList.add("open");
+        }
+        window.toggleAddDurationDropdown = toggleAddDurationDropdown;
+
+        function closeAddDurationDropdown() {
+            const menu = document.getElementById("addDurationMenu");
+            if (menu) menu.parentElement.classList.remove("open");
+        }
+        window.closeAddDurationDropdown = closeAddDurationDropdown;
+
+        document.addEventListener("click", function(e) {
+            if (!e.target.closest(".custom-select")) {
+                closeAddDurationDropdown();
+            }
+        });
+
+        function getAddDurationHours() {
+            if (addDurationState.mode === "custom") {
+                const val = parseInt(document.getElementById("keyDurationCustom").value, 10);
+                if (!val || val <= 0) { showToast("Enter a valid duration in hours!", true); return -1; }
+                return val;
+            }
+            return addDurationState.hours;
+        }
+
+        function randomKey() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789";
+            let s = "PH-";
+            for (let i = 0; i < 6; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
+            document.getElementById("keyInput").value = s;
+        }
+        window.randomKey = randomKey;
+
+        function addKey() {
+            const key = document.getElementById("keyInput").value.trim();
+            const note = document.getElementById("keyNameInput").value.trim();
+            const type = document.getElementById("keyTypeInput").value;
+            if (!key) { showToast("Key is required!", true); return; }
+            const durationHours = getAddDurationHours();
+            if (durationHours === -1) return;
+            set(ref(db, "ActiveUserKeys/" + key), {
+                createdAt: Date.now(),
+                durationHours: durationHours,
+                isUsed: false,
+                boundDeviceId: "NONE",
+                type: type,
+                note: note,
+                banned: false
+            })
+                .then(function() {
+                    showToast("Key saved!");
+                    document.getElementById("keyInput").value = "";
+                    document.getElementById("keyNameInput").value = "";
+                    document.getElementById("keyDurationCustom").value = "";
+                    addDurationState = { mode: "preset", hours: 99999 };
+                    document.getElementById("addDurationValue").innerText = "Lifetime";
+                    document.getElementById("addDurationCustomWrap").style.display = "none";
+                    loadKeys();
+                })
+                .catch(function() { showToast("Error saving key!", true); });
+        }
+        window.addKey = addKey;
+
+        function toggleBan(key) {
+            get(ref(db, "ActiveUserKeys/" + key)).then(function(snap) {
+                const data = snap.val() || {};
+                const banned = !data.banned;
+                update(ref(db, "ActiveUserKeys/" + key), { banned: banned }).then(function() {
+                    showToast(banned ? "Key banned!" : "Key unbanned!");
+                    loadKeys();
+                }).catch(function() { showToast("Error!", true); });
+            });
+        }
+        window.toggleBan = toggleBan;
+
+        function unbindDevice(key, deviceId) {
+            if (!confirm("Unbind device " + deviceId + " from this key? It can log in again only if unused.")) return;
+            const updates = {};
+            updates["ActiveUserKeys/" + key + "/boundDeviceId"] = "NONE";
+            updates["ActiveUserKeys/" + key + "/isUsed"] = false;
+            updates["ActiveUserKeys/" + key + "/boundDevices/" + deviceId] = null;
+            update(ref(db), updates).then(function() {
+                showToast("Device unbound!");
+                loadKeys();
+            }).catch(function() { showToast("Error!", true); });
+        }
+        window.unbindDevice = unbindDevice;
+
+        function editKey(key) {
+            get(ref(db, "ActiveUserKeys/" + key)).then(function(snap) {
+                const data = snap.val() || {};
+                const type = data.type || "Normal";
+                const dur = data.durationHours || 24;
+                const boundId = data.boundDeviceId && String(data.boundDeviceId) !== "NONE" && String(data.boundDeviceId) !== "none" ? String(data.boundDeviceId) : "";
+                const boundMap = data.boundDevices || {};
+                const boundList = [];
+                if (boundId) {
+                    boundList.push('<div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.04); border-radius:10px; padding:8px 12px; margin-bottom:6px;">' +
+                        '<span style="font-size:11px; color:#94a3b8; font-family:monospace;">' + esc(boundId) + '</span>' +
+                        '<button class="btn btn-red btn-small" onclick="unbindDevice(\'' + jsStr(key) + '\',\'' + jsStr(boundId) + '\');document.getElementById(\'modalOverlay\').classList.remove(\'show\');">✕</button>' +
+                        '</div>');
+                }
+                Object.keys(boundMap).forEach(function(did) {
+                    if (did === boundId) return;
+                    boundList.push('<div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.04); border-radius:10px; padding:8px 12px; margin-bottom:6px;">' +
+                        '<span style="font-size:11px; color:#94a3b8; font-family:monospace;">' + esc(did) + '</span>' +
+                        '<button class="btn btn-red btn-small" onclick="unbindDevice(\'' + jsStr(key) + '\',\'' + jsStr(did) + '\');document.getElementById(\'modalOverlay\').classList.remove(\'show\');">✕</button>' +
+                        '</div>');
+                });
+                document.getElementById("modalBody").innerHTML =
+                    '<h3>Edit Key: ' + esc(key) + '</h3>' +
+                    '<div class="form-row"><div><label>User Name / Note</label><input type="text" id="mKeyNote" value="' + esc(data.note || data.name || "") + '"></div></div>' +
+                    '<div class="form-row"><div><label>Type</label><select id="mKeyType">' +
+                    '<option value="Normal"' + (type === "Normal" ? " selected" : "") + '>Normal</option>' +
+                    '<option value="VIP"' + (type === "VIP" ? " selected" : "") + '>VIP</option></select></div></div>' +
+                    '<div class="form-row"><div><label>Duration (hours)</label><input type="number" id="mKeyDuration" value="' + dur + '" min="1"><div class="field-hint">Use <b>99999</b> for lifetime.</div></div></div>' +
+                    (boundList.length ? '<div style="margin-bottom:14px;"><label>Bound Device</label>' + boundList.join("") + '</div>' : '') +
+                    '<div style="display: flex; gap: 10px; justify-content: flex-end;">' +
+                    '<button class="btn btn-red btn-small" onclick="closeModal()">CANCEL</button>' +
+                    '<button class="btn btn-small" onclick="saveKeyEdit(\'' + jsStr(key) + '\')">SAVE</button></div>';
+                document.getElementById("modalOverlay").classList.add("show");
+            });
+        }
+        window.editKey = editKey;
+
+        function saveKeyEdit(key) {
+            const note = document.getElementById("mKeyNote").value.trim();
+            const type = document.getElementById("mKeyType").value;
+            const durationHours = parseInt(document.getElementById("mKeyDuration").value, 10);
+            if (!durationHours || durationHours <= 0) { showToast("Duration must be > 0 hours!", true); return; }
+            update(ref(db, "ActiveUserKeys/" + key), { note: note, type: type, durationHours: durationHours }).then(function() {
+                showToast("Key updated!");
+                closeModal();
+                loadKeys();
+            }).catch(function() { showToast("Error!", true); });
+        }
+        window.saveKeyEdit = saveKeyEdit;
+
+        function deleteKey(key) {
+            if (!confirm("Delete key " + key + "?")) return;
+            remove(ref(db, "ActiveUserKeys/" + key)).then(function() {
+                showToast("Key deleted!");
+                loadKeys();
+            }).catch(function() { showToast("Error!", true); });
+        }
+        window.deleteKey = deleteKey;
+
+        function clearExpiredKeys() {
+            get(ref(db, "ActiveUserKeys")).then(function(snap) {
+                if (!snap.exists()) { showToast("No keys to clean!"); return; }
+                const keys = snap.val();
+                const now = Date.now();
+                const expired = [];
+                Object.keys(keys).forEach(function(key) {
+                    const data = keys[key] || {};
+                    const dur = data.durationHours;
+                    let isExpired = false;
+                    if (dur) {
+                        if (dur !== 99999 && data.createdAt > 0) isExpired = now > (data.createdAt + dur * 3600000);
+                    } else {
+                        isExpired = data.expiresAt > 0 && now > data.expiresAt;
+                    }
+                    if (isExpired) expired.push(key);
+                });
+                if (!expired.length) { showToast("No expired keys!"); return; }
+                if (!confirm("Delete " + expired.length + " expired key(s)?")) return;
+                const updates = {};
+                expired.forEach(function(key) { updates["ActiveUserKeys/" + key] = null; });
+                update(ref(db), updates).then(function() {
+                    showToast(expired.length + " expired key(s) deleted!");
+                    loadKeys();
+                }).catch(function() { showToast("Error!", true); });
+            }).catch(function() { showToast("Error loading keys!", true); });
+        }
+        window.clearExpiredKeys = clearExpiredKeys;
+
+        function closeModal() {
+            document.getElementById("modalOverlay").classList.remove("show");
+        }
+        window.closeModal = closeModal;
+
+        document.getElementById("modalOverlay").addEventListener("click", function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>

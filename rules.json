@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "ActiveUserKeys": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "categories": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "posts": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "siteSettings": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "users": {
+      ".read": true,
+      ".write": "newData.exists()"
+    }
+  }
+}
