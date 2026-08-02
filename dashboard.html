@@ -339,7 +339,7 @@
 
         /* ==== UI ENHANCEMENTS: glow / glass / animation / touch ==== */
         body {
-            background: linear-gradient(135deg, #0a0f1e, #111a33, #141a35, #0d1428);
+            background: #0a0f1e;
         }
         @keyframes bgShift {
             0% { background-position: 0% 50%; }
@@ -353,13 +353,18 @@
             width: 380px;
             height: 380px;
             border-radius: 50%;
-            filter: blur(60px);
             opacity: 0.16;
             z-index: 0;
             pointer-events: none;
         }
-        body::before { top: -140px; left: -140px; background: #6366f1; }
-        body::after { bottom: -160px; right: -120px; background: #ec4899; }
+        body::before {
+            top: -140px; left: -140px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.55), transparent 70%);
+        }
+        body::after {
+            bottom: -160px; right: -120px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.55), transparent 70%);
+        }
         @keyframes orbFloat {
             0%, 100% { transform: translate(0, 0) scale(1); }
             50% { transform: translate(60px, 40px) scale(1.15); }
