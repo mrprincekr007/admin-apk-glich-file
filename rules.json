@@ -12,6 +12,10 @@
       ".read": true,
       ".write": "auth != null && auth.token.email === 'REPLACE_ADMIN_EMAIL'"
     },
+    "appUpdate": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email === 'REPLACE_ADMIN_EMAIL'"
+    },
     "ActiveUserKeys": {
       ".read": true,
       ".write": true

@@ -932,6 +932,49 @@
         </div>
 
         <div class="card">
+            <h3>App Update / Version Push</h3>
+            <div class="form-row">
+                <div>
+                    <label>Latest Version (number)</label>
+                    <input type="number" id="setUpdateLatest" min="1" placeholder="e.g. 2">
+                    <div class="field-hint">App ki current version se bada number dalo. Example: app v1 hai to 2 dalo → v1 users ko update aayega.</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Version Name (line)</label>
+                    <input type="text" id="setUpdateVersionName" placeholder="e.g. v2.0">
+                </div>
+                <div>
+                    <label>Update Type</label>
+                    <select id="setUpdateType">
+                        <option value="link">Link (browser me khulega)</option>
+                        <option value="apk">Direct (app me download + install)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Update Link</label>
+                    <input type="text" id="setUpdateLink" placeholder="https://... (link ya direct APK url)">
+                    <div class="field-hint"><b>Link type:</b> mediafire page ya koi bhi link. <b>Direct type:</b> APK ka <u>direct download</u> URL (mediafire page nahi) — warna download fail hoga.</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Update Note (line)</label>
+                    <input type="text" id="setUpdateNote" placeholder="e.g. Bug fixes + new features">
+                </div>
+            </div>
+            <button class="btn" onclick="saveAppUpdate()">PUSH UPDATE</button>
+            <p class="card-sub" style="margin-top:8px;">Note: <b>Latest Version number</b> hamesha badhao. PUSH dabaane par update sab users ko turant milta hai. Kisi ko bhejne se rokna ho to same/chhota number push karo (e.g. 1) — update band ho jayega.</p>
+            <div id="appUpdateLiveBox" style="margin-top:12px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:var(--panel-2);">
+                <div style="font-size:12px; letter-spacing:.5px; color:var(--muted); margin-bottom:6px;">CURRENTLY RUNNING UPDATE</div>
+                <div id="appUpdateLiveInfo" style="color:var(--text); font-size:13px; line-height:1.5;">Loading...</div>
+            </div>
+        </div>
+
+        <div class="card">
             <div class="theme-head">
                 <div class="t-icon">🎨</div>
                 <h3>Theme Colors</h3>
@@ -1073,7 +1116,7 @@
     <script type="module">
         import { auth, db } from "./firebase-config.js";
         import { onAuthStateChanged, signOut } from "firebase/auth";
-        import { ref, get, update } from "firebase/database";
+        import { ref, get, set, update } from "firebase/database";
 
         window.auth = auth;
         window.db = db;
@@ -1098,6 +1141,7 @@
             window.adminEmailAddr = user.email;
             applyAdminChip();
             loadSiteSettings();
+            loadAppUpdate();
         });
 
         document.getElementById("logoutBtn").addEventListener("click", function() {
@@ -1243,6 +1287,71 @@
             }).catch(function() { showToast("Error saving force redirect!", true); });
         }
         window.saveForceRedirect = saveForceRedirect;
+
+        function renderAppUpdateLive(u) {
+            const box = document.getElementById("appUpdateLiveBox");
+            const info = document.getElementById("appUpdateLiveInfo");
+            const isLive = !!u && u.enabled === true && (parseInt(u.latestVersion) || 0) > 0;
+            const name = (u && u.versionName) || ("v" + (u && u.latestVersion ? u.latestVersion : "?"));
+            const num = u ? (parseInt(u.latestVersion) || 0) : 0;
+            if (isLive) {
+                box.style.borderColor = "var(--green)";
+                info.innerHTML =
+                    "<span style='color:var(--green); font-weight:600;'>● LIVE — " + name + "</span><br>" +
+                    "Version number: <b>" + num + "</b> | Type: <b>" + (u.updateType === "apk" ? "Direct (app me download)" : "Link (browser)") + "</b><br>" +
+                    (u.updateNote ? "Note: " + u.updateNote + "<br>" : "") +
+                    "<span style='color:var(--muted); word-break:break-all;'>" + (u.updateLink || "") + "</span>";
+            } else {
+                box.style.borderColor = "var(--border)";
+                info.innerHTML = "<span style='color:var(--red); font-weight:600;'>● NO UPDATE RUNNING</span><br><span style='color:var(--muted);'>Abhi koi update push nahi hai — sab users apne current version par hain.</span>";
+            }
+        }
+        window.renderAppUpdateLive = renderAppUpdateLive;
+
+        function loadAppUpdate() {
+            get(ref(db, "appUpdate")).then(function(snap) {
+                const u = snap.exists() ? snap.val() : null;
+                renderAppUpdateLive(u);
+                if (!u) return;
+                if (u.latestVersion) document.getElementById("setUpdateLatest").value = u.latestVersion;
+                if (u.versionName) document.getElementById("setUpdateVersionName").value = u.versionName;
+                if (u.updateType) document.getElementById("setUpdateType").value = u.updateType;
+                if (u.updateLink) document.getElementById("setUpdateLink").value = u.updateLink;
+                if (u.updateNote) document.getElementById("setUpdateNote").value = u.updateNote;
+            }).catch(function() { });
+        }
+        window.loadAppUpdate = loadAppUpdate;
+
+        function saveAppUpdate() {
+            const num = parseInt(document.getElementById("setUpdateLatest").value) || 0;
+            const verName = document.getElementById("setUpdateVersionName").value.trim() || ("v" + (num || "?"));
+            const typeVal = document.getElementById("setUpdateType").value;
+            const link = document.getElementById("setUpdateLink").value.trim();
+            const note = document.getElementById("setUpdateNote").value.trim();
+            if (num <= 0) { showToast("Pehle Latest Version number dalo!", true); return; }
+            if (!link) { showToast("Update Link zaroori hai!", true); return; }
+            const ok = confirm(
+                "Update push karna confirm hai?\n\n" +
+                "Version: " + verName + " (number " + num + ")\n" +
+                "Type: " + (typeVal === "apk" ? "DIRECT — app me download+install" : "LINK — browser me khulega") + "\n" +
+                "Link: " + link + "\n\n" +
+                "Ye update SAB USERS ko turant milega. Agar number galat hai to CANCEL dabao."
+            );
+            if (!ok) return;
+            const data = {
+                enabled: true,
+                latestVersion: num,
+                versionName: document.getElementById("setUpdateVersionName").value.trim(),
+                updateType: typeVal,
+                updateLink: link,
+                updateNote: note
+            };
+            set(ref(db, "appUpdate"), data).then(function() {
+                renderAppUpdateLive(data);
+                showToast("Update pushed to users!");
+            }).catch(function() { showToast("Error saving update!", true); });
+        }
+        window.saveAppUpdate = saveAppUpdate;
 
         const THEME_PRESETS = {
             cyber: { bg: "#0b061f", card: "#140b2b", glow: "#bd00ff", btn: "#ff0080", accent: "#7928ca", muted: "#b4b1cc", mutedDeep: "#8c87ab" },
