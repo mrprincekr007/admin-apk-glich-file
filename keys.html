@@ -356,8 +356,8 @@
         }
 
         .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
-        .btn-green { background: var(--green); box-shadow: none; }
-        .btn-red { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .btn-green { background: rgba(5, 150, 105, 0.25); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.4); box-shadow: 0 6px 16px -6px rgba(16, 185, 129, 0.4); }
+        .btn-red { background: rgba(220, 38, 38, 0.25); color: #fca5a5; border: 1px solid rgba(248, 113, 113, 0.4); box-shadow: 0 6px 16px -6px rgba(220, 38, 38, 0.4); }
         .btn-small { padding: 8px 14px; font-size: 11px; }
 
         .list-item {
@@ -415,6 +415,22 @@
         }
 
         .key-expiry { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+        .key-countdown {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #fcd34d;
+            background: rgba(251, 191, 36, 0.12);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .key-expiry { display: none; }
+        }
 
         .empty-state {
             color: var(--muted);
@@ -575,16 +591,21 @@
 
             .topbar { margin-bottom: 16px; }
             .topbar h1 { font-size: 16px; }
-            .topbar .user-chip { padding: 7px 12px; font-size: 11px; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .topbar .user-chip { padding: 7px 12px; font-size: 11px; max-width: 45%; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
             .topbar-exit { display: block; padding: 7px 12px; font-size: 10px; }
 
             .card { padding: 14px; }
             .card > .btn { width: 100%; padding: 14px; font-size: 13px; }
             .form-row { grid-template-columns: 1fr; }
-            .list-item { flex-wrap: wrap; padding: 10px 12px; }
+            .list-item { flex-wrap: wrap; padding: 10px 12px; gap: 10px; }
+            .list-item .info { width: 100%; align-items: flex-start; }
             .list-item .info .thumb { width: 38px; height: 38px; }
-            .actions { width: 100%; justify-content: flex-end; }
-            .actions .btn { flex: 1; }
+            .list-item .info .t1 { font-size: 14px; }
+            .key-meta { gap: 6px !important; }
+            .key-countdown { font-size: 11px; font-weight: 700; padding: 3px 10px; }
+            .key-devices { display: flex; flex-wrap: wrap; gap: 6px; }
+            .actions { display: flex; width: 100%; justify-content: space-between; }
+            .actions .btn { flex: 1; padding: 10px 8px; font-size: 12px; }
         }
 
         /* ==== UI ENHANCEMENTS: glow / glass / animation / touch ==== */
@@ -692,6 +713,19 @@
 
         .topbar .user-chip {
             background: rgba(17, 24, 39, 0.97);
+        }
+        @media (min-width: 701px) {
+            .topbar .user-chip {
+                color: transparent;
+                text-shadow: 0 0 8px rgba(148, 163, 184, 0.75);
+                cursor: pointer;
+                user-select: none;
+                transition: color 0.25s ease, text-shadow 0.25s ease;
+            }
+            .topbar .user-chip:hover {
+                color: var(--muted);
+                text-shadow: none;
+            }
         }
         .topbar-exit { transition: all 0.25s ease; }
         .topbar-exit:hover { box-shadow: 0 6px 16px -4px rgba(239, 68, 68, 0.4); }
@@ -832,10 +866,13 @@
                 </div>
                 <div>
                     <label>Type</label>
-                    <select id="keyTypeInput">
-                        <option value="Normal">Normal</option>
-                        <option value="VIP">VIP</option>
-                    </select>
+                    <div class="custom-select">
+                        <button type="button" class="cs-trigger" onclick="toggleAddTypeDropdown()">
+                            <span class="cs-value" id="addTypeValue">Normal</span>
+                            <span class="cs-arrow">▾</span>
+                        </button>
+                        <div class="cs-menu" id="addTypeMenu"></div>
+                    </div>
                 </div>
             </div>
             <div class="form-row">
@@ -987,7 +1024,9 @@
                             ? new Date(data.expiresAt).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
                             : "Never";
                     }
-                    const type = data.type || "Normal";
+                const expiryMs = computeExpiryMs(data, dur);
+                const type = data.type || "Normal";
+                editTypeState = type;
                     const usedText = data.isUsed
                         ? '<span class="key-status" style="background:rgba(236,72,153,0.12); color:#ec4899; border:1px solid rgba(236,72,153,0.3);">USED</span>'
                         : '<span class="key-status" style="background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.3);">UNUSED</span>';
@@ -1005,10 +1044,10 @@
                     });
                     const unbindButtons = [];
                     if (boundId) {
-                        unbindButtons.push('<button class="btn btn-small" onclick="unbindDevice(\'' + jsStr(key) + '\',\'' + jsStr(boundId) + '\')">UNBIND</button>');
+                        unbindButtons.push('<button class="btn btn-small" onclick="unbindDevice(\'' + jsStr(key) + '\',\'' + jsStr(boundId) + '\')">RESET</button>');
                     }
                     boundExtra.forEach(function(did) {
-                        unbindButtons.push('<button class="btn btn-small" onclick="unbindDevice(\'' + jsStr(key) + '\',\'' + jsStr(did) + '\')">UNBIND</button>');
+                        unbindButtons.push('<button class="btn btn-small" onclick="unbindDevice(\'' + jsStr(key) + '\',\'' + jsStr(did) + '\')">RESET</button>');
                     });
                     const name = data.note || data.name || "";
                     const item = document.createElement("div");
@@ -1017,13 +1056,14 @@
                         '<div class="info"><div style="font-size: 20px;">🔑</div><div>' +
                         '<div class="t1">' + esc(key) + '</div>' +
                         '<div class="t2">' + esc(name || "-") + '</div>' +
-                        '<div style="display:flex; gap:8px; align-items:center; margin-top:4px; flex-wrap:wrap;">' +
+                        '<div class="key-meta" style="display:flex; gap:8px; align-items:center; margin-top:4px; flex-wrap:wrap;">' +
                         '<span class="key-status ' + statusCls + '">' + statusText + '</span>' +
                         typeText + usedText +
                         (durationText ? '<span class="key-expiry">⏰ ' + esc(durationText) + '</span>' : '') +
                         '<span class="key-expiry">Expires: ' + esc(expiryText) + '</span>' +
+                        (expiryMs > 0 ? '<span class="key-countdown" data-expiry="' + expiryMs + '">⏳ ' + esc(remainingText(expiryMs)) + '</span>' : '') +
                         '</div>' +
-                        (boundChips.length ? '<div style="margin-top:6px;">' + boundChips.join("") + '</div>' : '') +
+                        (boundChips.length ? '<div class="key-devices" style="margin-top:8px;">' + boundChips.join("") + '</div>' : '') +
                         '</div></div>' +
                         '<div class="actions">' +
                         unbindButtons.join("") +
@@ -1038,6 +1078,49 @@
             });
         }
         window.loadKeys = loadKeys;
+
+        function computeExpiryMs(data, dur) {
+            if (dur) {
+                if (dur === 99999 || !data.createdAt || data.createdAt <= 0) return 0;
+                return data.createdAt + dur * 3600000;
+            }
+            if (data.expiresAt && data.expiresAt > 0) return data.expiresAt;
+            return 0;
+        }
+
+        function remainingText(ms) {
+            const diff = ms - Date.now();
+            if (diff <= 0) return "Expired";
+            const s = Math.floor(diff / 1000);
+            const d = Math.floor(s / 86400);
+            const h = Math.floor((s % 86400) / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            const sec = s % 60;
+            if (d > 0) return d + "d " + h + "h " + m + "m " + sec + "s";
+            if (h > 0) return h + "h " + m + "m " + sec + "s";
+            if (m > 0) return m + "m " + sec + "s";
+            return sec + "s";
+        }
+
+        function updateCountdowns() {
+            document.querySelectorAll(".key-countdown").forEach(function(el) {
+                const exp = parseInt(el.getAttribute("data-expiry"), 10);
+                if (!exp) return;
+                if (Date.now() >= exp) {
+                    el.innerText = "⏳ Expired";
+                    const item = el.closest(".list-item");
+                    if (item) {
+                        const st = item.querySelector(".key-status.key-good");
+                        if (st) { st.textContent = "EXPIRED"; st.className = "key-status key-bad"; }
+                    }
+                } else {
+                    el.innerText = "⏳ " + remainingText(exp);
+                }
+            });
+        }
+        setInterval(updateCountdowns, 1000);
+        window.computeExpiryMs = computeExpiryMs;
+        window.remainingText = remainingText;
 
         let addDurationState = { mode: "preset", hours: 99999 };
 
@@ -1054,6 +1137,12 @@
         function toggleAddDurationDropdown() {
             const menu = document.getElementById("addDurationMenu");
             const wrap = menu.parentElement;
+            if (wrap.classList.contains("open")) {
+                wrap.classList.remove("open");
+                return;
+            }
+            closeAddTypeDropdown();
+            closeEditTypeDropdown();
             menu.innerHTML = "";
             KEY_DURATION_OPTIONS.forEach(function(opt) {
                 let isSel;
@@ -1090,9 +1179,88 @@
         }
         window.closeAddDurationDropdown = closeAddDurationDropdown;
 
+        let addTypeState = "Normal";
+        let editTypeState = "Normal";
+
+        const KEY_TYPE_OPTIONS = [
+            { value: "Normal", label: "Normal", icon: "⭐" },
+            { value: "VIP", label: "VIP", icon: "👑" }
+        ];
+
+        function renderTypeMenu(menuId, state, onPick) {
+            const menu = document.getElementById(menuId);
+            if (!menu) return;
+            menu.innerHTML = "";
+            KEY_TYPE_OPTIONS.forEach(function(opt) {
+                const isSel = state === opt.value;
+                const item = document.createElement("div");
+                item.className = "cs-option" + (isSel ? " selected" : "");
+                item.innerHTML =
+                    '<span class="cs-opt-name">' + opt.icon + ' ' + esc(opt.label) + '</span>' +
+                    '<span class="cs-opt-check">' + (isSel ? "✓" : "") + '</span>';
+                item.addEventListener("click", function() {
+                    onPick(opt);
+                    menu.parentElement.classList.remove("open");
+                });
+                menu.appendChild(item);
+            });
+        }
+
+        function toggleAddTypeDropdown() {
+            const menu = document.getElementById("addTypeMenu");
+            if (!menu) return;
+            const wrap = menu.parentElement;
+            if (wrap.classList.contains("open")) {
+                wrap.classList.remove("open");
+                return;
+            }
+            closeAddDurationDropdown();
+            closeEditTypeDropdown();
+            renderTypeMenu("addTypeMenu", addTypeState, function(opt) {
+                addTypeState = opt.value;
+                document.getElementById("addTypeValue").innerText = opt.label;
+            });
+            wrap.classList.add("open");
+        }
+        window.toggleAddTypeDropdown = toggleAddTypeDropdown;
+
+        function closeAddTypeDropdown() {
+            const menu = document.getElementById("addTypeMenu");
+            if (menu) menu.parentElement.classList.remove("open");
+        }
+        window.closeAddTypeDropdown = closeAddTypeDropdown;
+
+        function getAddType() { return addTypeState; }
+
+        function toggleEditTypeDropdown() {
+            const menu = document.getElementById("mTypeMenu");
+            if (!menu) return;
+            const wrap = menu.parentElement;
+            if (wrap.classList.contains("open")) {
+                wrap.classList.remove("open");
+                return;
+            }
+            closeAddDurationDropdown();
+            closeAddTypeDropdown();
+            renderTypeMenu("mTypeMenu", editTypeState, function(opt) {
+                editTypeState = opt.value;
+                document.getElementById("mTypeValue").innerText = opt.label;
+            });
+            wrap.classList.add("open");
+        }
+        window.toggleEditTypeDropdown = toggleEditTypeDropdown;
+
+        function closeEditTypeDropdown() {
+            const menu = document.getElementById("mTypeMenu");
+            if (menu) menu.parentElement.classList.remove("open");
+        }
+        window.closeEditTypeDropdown = closeEditTypeDropdown;
+
         document.addEventListener("click", function(e) {
             if (!e.target.closest(".custom-select")) {
                 closeAddDurationDropdown();
+                closeAddTypeDropdown();
+                closeEditTypeDropdown();
             }
         });
 
@@ -1116,7 +1284,7 @@
         function addKey() {
             const key = document.getElementById("keyInput").value.trim();
             const note = document.getElementById("keyNameInput").value.trim();
-            const type = document.getElementById("keyTypeInput").value;
+            const type = getAddType();
             if (!key) { showToast("Key is required!", true); return; }
             const durationHours = getAddDurationHours();
             if (durationHours === -1) return;
@@ -1192,9 +1360,11 @@
                 document.getElementById("modalBody").innerHTML =
                     '<h3>Edit Key: ' + esc(key) + '</h3>' +
                     '<div class="form-row"><div><label>User Name / Note</label><input type="text" id="mKeyNote" value="' + esc(data.note || data.name || "") + '"></div></div>' +
-                    '<div class="form-row"><div><label>Type</label><select id="mKeyType">' +
-                    '<option value="Normal"' + (type === "Normal" ? " selected" : "") + '>Normal</option>' +
-                    '<option value="VIP"' + (type === "VIP" ? " selected" : "") + '>VIP</option></select></div></div>' +
+                    '<div class="form-row"><div><label>Type</label><div class="custom-select">' +
+                    '<button type="button" class="cs-trigger" onclick="toggleEditTypeDropdown()">' +
+                    '<span class="cs-value" id="mTypeValue">' + esc(type) + '</span>' +
+                    '<span class="cs-arrow">▾</span></button>' +
+                    '<div class="cs-menu" id="mTypeMenu"></div></div></div></div>' +
                     '<div class="form-row"><div><label>Duration (hours)</label><input type="number" id="mKeyDuration" value="' + dur + '" min="1"><div class="field-hint">Use <b>99999</b> for lifetime.</div></div></div>' +
                     (boundList.length ? '<div style="margin-bottom:14px;"><label>Bound Device</label>' + boundList.join("") + '</div>' : '') +
                     '<div style="display: flex; gap: 10px; justify-content: flex-end;">' +
@@ -1207,7 +1377,7 @@
 
         function saveKeyEdit(key) {
             const note = document.getElementById("mKeyNote").value.trim();
-            const type = document.getElementById("mKeyType").value;
+            const type = editTypeState;
             const durationHours = parseInt(document.getElementById("mKeyDuration").value, 10);
             if (!durationHours || durationHours <= 0) { showToast("Duration must be > 0 hours!", true); return; }
             update(ref(db, "ActiveUserKeys/" + key), { note: note, type: type, durationHours: durationHours }).then(function() {
