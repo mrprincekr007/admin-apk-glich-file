@@ -1,20 +1,24 @@
 {
   "rules": {
-    "ActiveUserKeys": {
+    "siteSettings": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth != null && auth.token.email === 'REPLACE_ADMIN_EMAIL'"
     },
     "categories": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth != null && auth.token.email === 'REPLACE_ADMIN_EMAIL'"
     },
     "posts": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth != null && auth.token.email === 'REPLACE_ADMIN_EMAIL'"
     },
-    "siteSettings": {
+    "ActiveUserKeys": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": true
+    },
+    "BannedDevices": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email === 'REPLACE_ADMIN_EMAIL'"
     },
     "users": {
       ".read": true,
