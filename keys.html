@@ -890,6 +890,16 @@
                     <label>Custom Duration (hours)</label>
                     <input type="number" id="keyDurationCustom" min="1" placeholder="e.g. 48">
                 </div>
+                <div>
+                    <label>Device Limit</label>
+                    <div class="custom-select">
+                        <button type="button" class="cs-trigger" onclick="toggleAddLimitDropdown()">
+                            <span class="cs-value" id="addLimitValue">Unlimited</span>
+                            <span class="cs-arrow">▾</span>
+                        </button>
+                        <div class="cs-menu" id="addLimitMenu"></div>
+                    </div>
+                </div>
             </div>
             <button class="btn" onclick="addKey()">Save Key</button>
         </div>
@@ -1042,6 +1052,7 @@
                     boundExtra.forEach(function(did) {
                         boundChips.push('<span class="key-expiry" style="display:inline-flex; align-items:center; gap:4px; margin-right:8px;" title="' + esc(did) + '">📱 ' + esc(did.length > 12 ? did.slice(0, 12) + "..." : did) + '</span>');
                     });
+                    const limitChip = '<span class="key-status" style="background:rgba(56,189,248,0.12); color:#38bdf8; border:1px solid rgba(56,189,248,0.3);">📱 ' + boundChips.length + '/' + (data.maxDevices ? data.maxDevices : "∞") + '</span>';
                     const unbindButtons = [];
                     if (boundId) {
                         unbindButtons.push('<button class="btn btn-small" onclick="unbindDevice(\'' + jsStr(key) + '\',\'' + jsStr(boundId) + '\')">RESET</button>');
@@ -1058,7 +1069,7 @@
                         '<div class="t2">' + esc(name || "-") + '</div>' +
                         '<div class="key-meta" style="display:flex; gap:8px; align-items:center; margin-top:4px; flex-wrap:wrap;">' +
                         '<span class="key-status ' + statusCls + '">' + statusText + '</span>' +
-                        typeText + usedText +
+                        typeText + usedText + limitChip +
                         (durationText ? '<span class="key-expiry">⏰ ' + esc(durationText) + '</span>' : '') +
                         '<span class="key-expiry">Expires: ' + esc(expiryText) + '</span>' +
                         (expiryMs > 0 ? '<span class="key-countdown" data-expiry="' + expiryMs + '">⏳ ' + esc(remainingText(expiryMs)) + '</span>' : '') +
@@ -1143,6 +1154,8 @@
             }
             closeAddTypeDropdown();
             closeEditTypeDropdown();
+            closeAddLimitDropdown();
+            closeEditLimitDropdown();
             menu.innerHTML = "";
             KEY_DURATION_OPTIONS.forEach(function(opt) {
                 let isSel;
@@ -1216,6 +1229,8 @@
             }
             closeAddDurationDropdown();
             closeEditTypeDropdown();
+            closeAddLimitDropdown();
+            closeEditLimitDropdown();
             renderTypeMenu("addTypeMenu", addTypeState, function(opt) {
                 addTypeState = opt.value;
                 document.getElementById("addTypeValue").innerText = opt.label;
@@ -1232,6 +1247,96 @@
 
         function getAddType() { return addTypeState; }
 
+        const KEY_LIMIT_OPTIONS = [
+            { value: 0, label: "Unlimited" },
+            { value: 1, label: "1 Device" },
+            { value: 2, label: "2 Devices" },
+            { value: 3, label: "3 Devices" },
+            { value: 5, label: "5 Devices" }
+        ];
+
+        let addLimitState = 0;
+        let editLimitState = 0;
+
+        function limitLabel(v) {
+            const vn = parseInt(v, 10) || 0;
+            const opt = KEY_LIMIT_OPTIONS.find(function(o) { return o.value === vn; });
+            return opt ? opt.label : (vn + " Devices");
+        }
+
+        function renderLimitMenu(menuId, state, onPick) {
+            const menu = document.getElementById(menuId);
+            if (!menu) return;
+            menu.innerHTML = "";
+            KEY_LIMIT_OPTIONS.forEach(function(opt) {
+                const isSel = state === opt.value;
+                const item = document.createElement("div");
+                item.className = "cs-option" + (isSel ? " selected" : "");
+                item.innerHTML =
+                    '<span class="cs-opt-name">📱 ' + esc(opt.label) + '</span>' +
+                    '<span class="cs-opt-check">' + (isSel ? "✓" : "") + '</span>';
+                item.addEventListener("click", function() {
+                    onPick(opt);
+                    menu.parentElement.classList.remove("open");
+                });
+                menu.appendChild(item);
+            });
+        }
+
+        function toggleAddLimitDropdown() {
+            const menu = document.getElementById("addLimitMenu");
+            if (!menu) return;
+            const wrap = menu.parentElement;
+            if (wrap.classList.contains("open")) {
+                wrap.classList.remove("open");
+                return;
+            }
+            closeAddDurationDropdown();
+            closeAddTypeDropdown();
+            closeEditTypeDropdown();
+            closeEditLimitDropdown();
+            renderLimitMenu("addLimitMenu", addLimitState, function(opt) {
+                addLimitState = opt.value;
+                document.getElementById("addLimitValue").innerText = opt.label;
+            });
+            wrap.classList.add("open");
+        }
+        window.toggleAddLimitDropdown = toggleAddLimitDropdown;
+
+        function closeAddLimitDropdown() {
+            const menu = document.getElementById("addLimitMenu");
+            if (menu) menu.parentElement.classList.remove("open");
+        }
+        window.closeAddLimitDropdown = closeAddLimitDropdown;
+
+        function toggleEditLimitDropdown() {
+            const menu = document.getElementById("mLimitMenu");
+            if (!menu) return;
+            const wrap = menu.parentElement;
+            if (wrap.classList.contains("open")) {
+                wrap.classList.remove("open");
+                return;
+            }
+            closeAddDurationDropdown();
+            closeAddTypeDropdown();
+            closeEditTypeDropdown();
+            closeAddLimitDropdown();
+            renderLimitMenu("mLimitMenu", editLimitState, function(opt) {
+                editLimitState = opt.value;
+                document.getElementById("mLimitValue").innerText = opt.label;
+            });
+            wrap.classList.add("open");
+        }
+        window.toggleEditLimitDropdown = toggleEditLimitDropdown;
+
+        function closeEditLimitDropdown() {
+            const menu = document.getElementById("mLimitMenu");
+            if (menu) menu.parentElement.classList.remove("open");
+        }
+        window.closeEditLimitDropdown = closeEditLimitDropdown;
+
+        function getAddLimit() { return addLimitState; }
+
         function toggleEditTypeDropdown() {
             const menu = document.getElementById("mTypeMenu");
             if (!menu) return;
@@ -1242,6 +1347,8 @@
             }
             closeAddDurationDropdown();
             closeAddTypeDropdown();
+            closeAddLimitDropdown();
+            closeEditLimitDropdown();
             renderTypeMenu("mTypeMenu", editTypeState, function(opt) {
                 editTypeState = opt.value;
                 document.getElementById("mTypeValue").innerText = opt.label;
@@ -1261,6 +1368,8 @@
                 closeAddDurationDropdown();
                 closeAddTypeDropdown();
                 closeEditTypeDropdown();
+                closeAddLimitDropdown();
+                closeEditLimitDropdown();
             }
         });
 
@@ -1291,6 +1400,7 @@
             set(ref(db, "ActiveUserKeys/" + key), {
                 createdAt: Date.now(),
                 durationHours: durationHours,
+                maxDevices: getAddLimit(),
                 isUsed: false,
                 boundDeviceId: "NONE",
                 type: type,
@@ -1305,6 +1415,8 @@
                     addDurationState = { mode: "preset", hours: 99999 };
                     document.getElementById("addDurationValue").innerText = "Lifetime";
                     document.getElementById("addDurationCustomWrap").style.display = "none";
+                    addLimitState = 0;
+                    document.getElementById("addLimitValue").innerText = "Unlimited";
                     loadKeys();
                 })
                 .catch(function() { showToast("Error saving key!", true); });
@@ -1340,6 +1452,8 @@
             get(ref(db, "ActiveUserKeys/" + key)).then(function(snap) {
                 const data = snap.val() || {};
                 const type = data.type || "Normal";
+                editTypeState = type;
+                editLimitState = parseInt(data.maxDevices, 10) || 0;
                 const dur = data.durationHours || 24;
                 const boundId = data.boundDeviceId && String(data.boundDeviceId) !== "NONE" && String(data.boundDeviceId) !== "none" ? String(data.boundDeviceId) : "";
                 const boundMap = data.boundDevices || {};
@@ -1366,6 +1480,11 @@
                     '<span class="cs-arrow">▾</span></button>' +
                     '<div class="cs-menu" id="mTypeMenu"></div></div></div></div>' +
                     '<div class="form-row"><div><label>Duration (hours)</label><input type="number" id="mKeyDuration" value="' + dur + '" min="1"><div class="field-hint">Use <b>99999</b> for lifetime.</div></div></div>' +
+                    '<div class="form-row"><div><label>Device Limit</label><div class="custom-select">' +
+                    '<button type="button" class="cs-trigger" onclick="toggleEditLimitDropdown()">' +
+                    '<span class="cs-value" id="mLimitValue">' + esc(limitLabel(data.maxDevices)) + '</span>' +
+                    '<span class="cs-arrow">▾</span></button>' +
+                    '<div class="cs-menu" id="mLimitMenu"></div></div></div></div>' +
                     (boundList.length ? '<div style="margin-bottom:14px;"><label>Bound Device</label>' + boundList.join("") + '</div>' : '') +
                     '<div style="display: flex; gap: 10px; justify-content: flex-end;">' +
                     '<button class="btn btn-red btn-small" onclick="closeModal()">CANCEL</button>' +
@@ -1380,7 +1499,7 @@
             const type = editTypeState;
             const durationHours = parseInt(document.getElementById("mKeyDuration").value, 10);
             if (!durationHours || durationHours <= 0) { showToast("Duration must be > 0 hours!", true); return; }
-            update(ref(db, "ActiveUserKeys/" + key), { note: note, type: type, durationHours: durationHours }).then(function() {
+            update(ref(db, "ActiveUserKeys/" + key), { note: note, type: type, durationHours: durationHours, maxDevices: editLimitState }).then(function() {
                 showToast("Key updated!");
                 closeModal();
                 loadKeys();
