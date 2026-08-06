@@ -71,9 +71,13 @@
         }
 
         .sidebar .logo .name {
-            font-size: 15px;
+            font-size: 12px;
             font-weight: 800;
             letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         .sidebar .logo .role {
@@ -106,6 +110,39 @@
         }
 
         .nav-item .ic { font-size: 16px; width: 22px; text-align: center; }
+        .nav-item .nav-arrow { margin-left: auto; font-size: 10px; transition: transform 0.25s; }
+        .nav-item.open .nav-arrow { transform: rotate(180deg); }
+        .nav-sub { display: none; padding: 2px 0 6px 0; }
+        .nav-item.open + .nav-sub { display: block; }
+        .nav-sub-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px 9px 40px;
+            border-radius: 10px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .nav-sub-item:hover { background: var(--panel-2); color: var(--text); }
+        .nav-sub-item.active { background: rgba(99, 102, 241, 0.2); color: #fff; border: 1px solid var(--border); }
+
+        .svg-ic { display: inline-block; vertical-align: middle; flex-shrink: 0; pointer-events: none; }
+        .nav-sub-item .svg-ic { margin-right: 2px; }
+        .btn .svg-ic { margin-right: 6px; }
+
+        .nav-item[data-view="overview"] .ic, .m-item[data-view="overview"] .ic { color: #818cf8; }
+        .nav-item[data-view="keys"] .ic, .m-item[data-view="keys"] .ic { color: #fbbf24; }
+        .nav-item[data-view="categories"] .ic, .m-item[data-view="categories"] .ic { color: #fb923c; }
+        .nav-item[data-view="posts"] .ic, .m-item[data-view="posts"] .ic { color: #c084fc; }
+        .nav-item[data-view="settings"] .ic, .m-item[data-view="settings"] .ic { color: #38bdf8; }
+        .nav-sub-item:nth-child(1) .svg-ic { color: #38bdf8; }
+        .nav-sub-item:nth-child(2) .svg-ic { color: #c084fc; }
+        .nav-sub-item:nth-child(3) .svg-ic { color: #34d399; }
 
         .sidebar .logout {
             margin-top: auto;
@@ -966,28 +1003,33 @@
 
     <aside class="sidebar">
         <div class="logo">
-            <div class="icon">🛡️</div>
+            <div class="icon"><svg class="svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M8.5 11l2.5 2.5L15.5 8.5" stroke="#fde047" stroke-width="2.4"/></svg></div>
             <div>
                 <div class="name">PRINCE HACKS</div>
                 <div class="role">Admin Panel</div>
             </div>
         </div>
 
-        <div class="nav-item" data-view="overview"><span class="ic">📊</span><span class="txt">Overview</span></div>
-        <div class="nav-item" data-view="keys"><span class="ic">🔑</span><span class="txt">User Keys</span></div>
-        <div class="nav-item" data-view="categories"><span class="ic">🗂️</span><span class="txt">Categories</span></div>
-        <div class="nav-item active" data-view="posts"><span class="ic">📦</span><span class="txt">Posts</span></div>
-        <div class="nav-item" data-view="settings"><span class="ic">⚙️</span><span class="txt">Settings</span></div>
+        <div class="nav-item" data-view="overview"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><span class="txt">Overview</span></div>
+        <div class="nav-item" data-view="keys"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.5 12.5 20 3M14 9l3 3M17.5 5.5l3 3"/></svg></span><span class="txt">User Keys</span></div>
+        <div class="nav-item" data-view="categories"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></span><span class="txt">Categories</span></div>
+        <div class="nav-item active" data-view="posts"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span><span class="txt">Posts</span></div>
+        <div class="nav-item" data-view="settings"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg></span><span class="txt">Settings</span><span class="nav-arrow">▾</span></div>
+        <div class="nav-sub" id="settingsSub">
+            <div class="nav-sub-item" onclick="window.location.href='settings.html?tab=general'"><svg class="svg-ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 10h6M9 14h6M9 18h4"/></svg> Site Settings</div>
+            <div class="nav-sub-item" onclick="window.location.href='settings.html?tab=theme'"><svg class="svg-ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-.9-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1.1.9-2 2-2H17a5 5 0 0 0 5-5c0-4.4-4.5-8.5-10-8.5z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="14.5" cy="7.5" r="1"/></svg> UI Management</div>
+            <div class="nav-sub-item" onclick="window.location.href='settings.html?tab=password'"><svg class="svg-ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.5"/></svg> Password Change</div>
+        </div>
 
         <button class="logout" id="logoutBtn">LOGOUT</button>
     </aside>
 
     <nav class="mobile-nav" id="mobileNav">
-        <div class="m-item" data-view="overview"><span class="ic">📊</span>Home</div>
-        <div class="m-item" data-view="keys"><span class="ic">🔑</span>Keys</div>
-        <div class="m-item" data-view="categories"><span class="ic">🗂️</span>Cats</div>
-        <div class="m-item active" data-view="posts"><span class="ic">📦</span>Posts</div>
-        <div class="m-item" data-view="settings"><span class="ic">⚙️</span>Settings</div>
+        <div class="m-item" data-view="overview"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>Home</div>
+        <div class="m-item" data-view="keys"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.5 12.5 20 3M14 9l3 3M17.5 5.5l3 3"/></svg></span>Keys</div>
+        <div class="m-item" data-view="categories"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></span>Cats</div>
+        <div class="m-item active" data-view="posts"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span>Posts</div>
+        <div class="m-item" data-view="settings"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg></span>Settings</div>
     </nav>
 
     <div class="main">
@@ -995,7 +1037,7 @@
             <h1 id="pageTitle">Posts</h1>
             <div class="topbar-right">
                 <div class="user-chip" id="adminEmail">Admin</div>
-                <button class="topbar-exit" onclick="document.getElementById('logoutBtn').click()">🚪 EXIT</button>
+                <button class="topbar-exit" onclick="document.getElementById('logoutBtn').click()"><svg class="svg-ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5M15 16l4-4-4-4M19 12H9"/></svg> EXIT</button>
             </div>
         </div>
 
@@ -1101,6 +1143,17 @@
                 window.location.href = "index.html";
                 return;
             }
+            const loginTime = parseInt(localStorage.getItem("adminLoginTime") || "0", 10);
+            if (!loginTime) {
+                localStorage.setItem("adminLoginTime", String(Date.now()));
+            } else if (Date.now() - loginTime > 24 * 60 * 60 * 1000) {
+                signOut(auth).then(function() {
+                    sessionStorage.removeItem("adminLoggedIn");
+                    localStorage.removeItem("adminLoginTime");
+                    window.location.href = "index.html";
+                });
+                return;
+            }
             window.adminEmailAddr = user.email;
             applyAdminChip();
             loadPostCategorySelect();
@@ -1122,7 +1175,11 @@
                 }
                 if (view === "posts") return;
                 if (view === "settings") {
-                    window.location.href = "settings.html";
+                    if (item.classList.contains("m-item")) {
+                        window.location.href = "settings.html";
+                        return;
+                    }
+                    item.classList.toggle("open");
                     return;
                 }
                 if (view === "categories") {
@@ -1258,12 +1315,12 @@
                     item.className = "list-item post-card";
                     let catLabel = "";
                     if (!catKey) {
-                        catLabel = '<div class="post-cat">🗂️ ' + esc(catNameMap[catKey2] || catKey2) + '</div>';
+                        catLabel = '<div class="post-cat"><svg class="svg-ic" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#fb923c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg> ' + esc(catNameMap[catKey2] || catKey2) + '</div>';
                     }
                     let badges = "";
-                    if (p.link) badges += '<span class="badge">🎮 Free Fire</span>';
-                    if (p.link2) badges += '<span class="badge">🎮 FF MAX</span>';
-                    if (p.zipLink) badges += '<span class="badge zip">📦 ZIP</span>';
+                    if (p.link) badges += '<span class="badge"><svg class="svg-ic" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 6h10M7 12h10M7 18h10"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg> Free Fire</span>';
+                    if (p.link2) badges += '<span class="badge"><svg class="svg-ic" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 6h10M7 12h10M7 18h10"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg> FF MAX</span>';
+                    if (p.zipLink) badges += '<span class="badge zip"><svg class="svg-ic" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg> ZIP</span>';
                     if (!badges) badges = '<span class="badge none">No links</span>';
                     item.innerHTML =
                         catLabel +

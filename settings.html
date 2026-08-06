@@ -71,9 +71,13 @@
         }
 
         .sidebar .logo .name {
-            font-size: 15px;
+            font-size: 12px;
             font-weight: 800;
             letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         .sidebar .logo .role {
@@ -106,6 +110,80 @@
         }
 
         .nav-item .ic { font-size: 16px; width: 22px; text-align: center; }
+        .nav-item .nav-arrow { margin-left: auto; font-size: 10px; transition: transform 0.25s; }
+        .nav-item.active .nav-arrow { transform: rotate(180deg); }
+        .nav-sub { display: none; padding: 2px 0 6px 0; }
+        .nav-item.active + .nav-sub { display: block; }
+        .nav-sub-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px 12px 40px;
+            border-radius: 10px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .nav-sub-item:hover { background: var(--panel-2); color: var(--text); }
+        .nav-sub-item.active { background: rgba(99, 102, 241, 0.2); color: #fff; border: 1px solid var(--border); }
+
+        .svg-ic { display: inline-block; vertical-align: middle; flex-shrink: 0; pointer-events: none; }
+        .nav-sub-item .svg-ic { margin-right: 2px; }
+        .btn .svg-ic { margin-right: 6px; }
+
+        .nav-item[data-view="overview"] .ic, .m-item[data-view="overview"] .ic { color: #818cf8; }
+        .nav-item[data-view="keys"] .ic, .m-item[data-view="keys"] .ic { color: #fbbf24; }
+        .nav-item[data-view="categories"] .ic, .m-item[data-view="categories"] .ic { color: #fb923c; }
+        .nav-item[data-view="posts"] .ic, .m-item[data-view="posts"] .ic { color: #c084fc; }
+        .nav-item[data-view="settings"] .ic, .m-item[data-view="settings"] .ic { color: #38bdf8; }
+        .nav-sub-item:nth-child(1) .svg-ic, .nav-sub-item[data-sub="general"] .svg-ic, .sub-tab[data-tab="general"] .svg-ic { color: #38bdf8; }
+        .nav-sub-item:nth-child(2) .svg-ic, .nav-sub-item[data-sub="theme"] .svg-ic, .sub-tab[data-tab="theme"] .svg-ic { color: #c084fc; }
+        .nav-sub-item:nth-child(3) .svg-ic, .nav-sub-item[data-sub="password"] .svg-ic, .sub-tab[data-tab="password"] .svg-ic { color: #34d399; }
+
+        .sub-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .sub-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sub-tab:hover { color: var(--text); border-color: rgba(99, 102, 241, 0.4); }
+        .sub-tab.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(236, 72, 153, 0.25));
+            color: #fff;
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+        @media (max-width: 700px) {
+            .sub-tabs {
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            .sub-tab {
+                width: 100%;
+                text-align: center;
+                padding: 15px 18px;
+                font-size: 15px;
+                border-radius: 14px;
+            }
+        }
 
         .sidebar .logout {
             margin-top: auto;
@@ -261,6 +339,7 @@
         }
 
         .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .btn-red { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); }
         .btn-small { padding: 8px 14px; font-size: 11px; }
         .btn-outline { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.16); color: var(--text); }
@@ -766,28 +845,33 @@
 
     <aside class="sidebar">
         <div class="logo">
-            <div class="icon">🛡️</div>
+            <div class="icon"><svg class="svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M8.5 11l2.5 2.5L15.5 8.5" stroke="#fde047" stroke-width="2.4"/></svg></div>
             <div>
                 <div class="name">PRINCE HACKS</div>
                 <div class="role">Admin Panel</div>
             </div>
         </div>
 
-        <div class="nav-item" data-view="overview"><span class="ic">📊</span><span class="txt">Overview</span></div>
-        <div class="nav-item" data-view="keys"><span class="ic">🔑</span><span class="txt">User Keys</span></div>
-        <div class="nav-item" data-view="categories"><span class="ic">🗂️</span><span class="txt">Categories</span></div>
-        <div class="nav-item" data-view="posts"><span class="ic">📦</span><span class="txt">Posts</span></div>
-        <div class="nav-item active" data-view="settings"><span class="ic">⚙️</span><span class="txt">Settings</span></div>
+        <div class="nav-item" data-view="overview"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><span class="txt">Overview</span></div>
+        <div class="nav-item" data-view="keys"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.5 12.5 20 3M14 9l3 3M17.5 5.5l3 3"/></svg></span><span class="txt">User Keys</span></div>
+        <div class="nav-item" data-view="categories"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></span><span class="txt">Categories</span></div>
+        <div class="nav-item" data-view="posts"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span><span class="txt">Posts</span></div>
+        <div class="nav-item active" data-view="settings"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg></span><span class="txt">Settings</span><span class="nav-arrow">▾</span></div>
+        <div class="nav-sub" id="settingsSub">
+            <div class="nav-sub-item active" data-sub="general" onclick="switchSettingsTab('general')"><svg class="svg-ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 10h6M9 14h6M9 18h4"/></svg> Site Settings</div>
+            <div class="nav-sub-item" data-sub="theme" onclick="switchSettingsTab('theme')"><svg class="svg-ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-.9-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1.1.9-2 2-2H17a5 5 0 0 0 5-5c0-4.4-4.5-8.5-10-8.5z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="14.5" cy="7.5" r="1"/></svg> UI Management</div>
+            <div class="nav-sub-item" data-sub="password" onclick="switchSettingsTab('password')"><svg class="svg-ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.5"/></svg> Password Change</div>
+        </div>
 
         <button class="logout" id="logoutBtn">LOGOUT</button>
     </aside>
 
     <nav class="mobile-nav" id="mobileNav">
-        <div class="m-item" data-view="overview"><span class="ic">📊</span>Home</div>
-        <div class="m-item" data-view="keys"><span class="ic">🔑</span>Keys</div>
-        <div class="m-item" data-view="categories"><span class="ic">🗂️</span>Cats</div>
-        <div class="m-item" data-view="posts"><span class="ic">📦</span>Posts</div>
-        <div class="m-item active" data-view="settings"><span class="ic">⚙️</span>Settings</div>
+        <div class="m-item" data-view="overview"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>Home</div>
+        <div class="m-item" data-view="keys"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.5 12.5 20 3M14 9l3 3M17.5 5.5l3 3"/></svg></span>Keys</div>
+        <div class="m-item" data-view="categories"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></span>Cats</div>
+        <div class="m-item" data-view="posts"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span>Posts</div>
+        <div class="m-item active" data-view="settings"><span class="ic"><svg class="svg-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg></span>Settings</div>
     </nav>
 
     <div class="main">
@@ -795,11 +879,17 @@
             <h1 id="pageTitle">Settings</h1>
             <div class="topbar-right">
                 <div class="user-chip" id="adminEmail">Admin</div>
-                <button class="topbar-exit" onclick="document.getElementById('logoutBtn').click()">🚪 EXIT</button>
+                <button class="topbar-exit" onclick="document.getElementById('logoutBtn').click()"><svg class="svg-ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5M15 16l4-4-4-4M19 12H9"/></svg> EXIT</button>
             </div>
         </div>
 
-        <div class="card">
+        <div class="sub-tabs">
+            <button class="sub-tab active" data-tab="general" onclick="switchSettingsTab('general')"><svg class="svg-ic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 10h6M9 14h6M9 18h4"/></svg> Site Settings</button>
+            <button class="sub-tab" data-tab="theme" onclick="switchSettingsTab('theme')"><svg class="svg-ic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-.9-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1.1.9-2 2-2H17a5 5 0 0 0 5-5c0-4.4-4.5-8.5-10-8.5z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="14.5" cy="7.5" r="1"/></svg> UI Management</button>
+            <button class="sub-tab" data-tab="password" onclick="switchSettingsTab('password')"><svg class="svg-ic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.5"/></svg> Password Change</button>
+        </div>
+
+        <div class="card settings-card" data-sec="general">
             <h3>Site Settings</h3>
             <div class="form-row">
                 <div>
@@ -841,7 +931,29 @@
             <button class="btn" onclick="saveSiteSettings()">SAVE SETTINGS</button>
         </div>
 
-        <div class="card">
+        <div class="card settings-card" data-sec="password">
+            <h3><svg class="svg-ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.5"/></svg> Change Admin Password</h3>
+            <p class="card-sub">Apna admin panel password badlo — current password confirm karke naya password set karo.</p>
+            <div class="form-row">
+                <div>
+                    <label>Current Password</label>
+                    <input type="password" id="pwCurrent" placeholder="Current password" autocomplete="current-password">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>New Password</label>
+                    <input type="password" id="pwNew" placeholder="New password (min 6 characters)" autocomplete="new-password">
+                </div>
+                <div>
+                    <label>Confirm New Password</label>
+                    <input type="password" id="pwConfirm" placeholder="Confirm new password" autocomplete="new-password">
+                </div>
+            </div>
+            <button class="btn" id="pwBtn" onclick="changeAdminPassword()">CHANGE PASSWORD</button>
+        </div>
+
+        <div class="card settings-card" data-sec="general">
             <h3>Maintenance Mode</h3>
             <div class="form-row">
                 <div>
@@ -872,7 +984,7 @@
             <button class="btn" onclick="saveMaintenance()">SAVE MAINTENANCE</button>
         </div>
 
-        <div class="card">
+        <div class="card settings-card" data-sec="general">
             <h3>Subscribe / Join Popup</h3>
             <div class="form-row">
                 <div>
@@ -909,7 +1021,7 @@
             <button class="btn" onclick="savePopupSettings()">SAVE POPUP</button>
         </div>
 
-        <div class="card">
+        <div class="card settings-card" data-sec="general">
             <h3>Force Subscribe / Redirect</h3>
             <div class="form-row">
                 <div>
@@ -931,7 +1043,7 @@
             <button class="btn" onclick="saveForceRedirect()">SAVE FORCE REDIRECT</button>
         </div>
 
-        <div class="card">
+        <div class="card settings-card" data-sec="general">
             <h3>App Update / Version Push</h3>
             <div class="form-row">
                 <div>
@@ -974,9 +1086,9 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card settings-card" data-sec="theme">
             <div class="theme-head">
-                <div class="t-icon">🎨</div>
+                <div class="t-icon"><svg class="svg-ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-.9-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1.1.9-2 2-2H17a5 5 0 0 0 5-5c0-4.4-4.5-8.5-10-8.5z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="14.5" cy="7.5" r="1"/></svg></div>
                 <h3>Theme Colors</h3>
                 <span class="theme-live">● LIVE</span>
             </div>
@@ -1104,8 +1216,8 @@
                 </div>
 
             <div class="theme-actions">
-                <button class="btn" onclick="saveThemeColors()">💾 SAVE THEME</button>
-                <button class="btn btn-outline" onclick="revertThemeColors()">↺ REVERT</button>
+                <button class="btn" onclick="saveThemeColors()"><svg class="svg-ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> SAVE THEME</button>
+                <button class="btn btn-outline" onclick="revertThemeColors()"><svg class="svg-ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> REVERT</button>
                 <button class="btn btn-red btn-small" onclick="resetThemeColors()">RESET DEFAULTS</button>
             </div>
         </div>
@@ -1115,7 +1227,7 @@
 
     <script type="module">
         import { auth, db } from "./firebase-config.js";
-        import { onAuthStateChanged, signOut } from "firebase/auth";
+        import { onAuthStateChanged, signOut, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
         import { ref, get, set, update } from "firebase/database";
 
         window.auth = auth;
@@ -1136,6 +1248,17 @@
         onAuthStateChanged(auth, function(user) {
             if (!user) {
                 window.location.href = "index.html";
+                return;
+            }
+            const loginTime = parseInt(localStorage.getItem("adminLoginTime") || "0", 10);
+            if (!loginTime) {
+                localStorage.setItem("adminLoginTime", String(Date.now()));
+            } else if (Date.now() - loginTime > 24 * 60 * 60 * 1000) {
+                signOut(auth).then(function() {
+                    sessionStorage.removeItem("adminLoggedIn");
+                    localStorage.removeItem("adminLoginTime");
+                    window.location.href = "index.html";
+                });
                 return;
             }
             window.adminEmailAddr = user.email;
@@ -1246,6 +1369,66 @@
             }).catch(function() { showToast("Error saving settings!", true); });
         }
         window.saveSiteSettings = saveSiteSettings;
+
+        function changeAdminPassword() {
+            const current = document.getElementById("pwCurrent").value;
+            const next = document.getElementById("pwNew").value;
+            const confirmVal = document.getElementById("pwConfirm").value;
+            const btn = document.getElementById("pwBtn");
+            if (!current || !next || !confirmVal) { showToast("Saare fields bharo!", true); return; }
+            if (next.length < 6) { showToast("New password kam se kam 6 characters ka ho!", true); return; }
+            if (next !== confirmVal) { showToast("New password aur confirm match nahi karte!", true); return; }
+            const user = auth.currentUser;
+            if (!user) { showToast("Login nahi hai!", true); return; }
+            btn.disabled = true;
+            btn.innerText = "CHANGING...";
+            reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, current))
+                .then(function() {
+                    return updatePassword(auth.currentUser, next);
+                })
+                .then(function() {
+                    showToast("Password changed! Naye password se login karo.");
+                    document.getElementById("pwCurrent").value = "";
+                    document.getElementById("pwNew").value = "";
+                    document.getElementById("pwConfirm").value = "";
+                })
+                .catch(function(err) {
+                    let msg = "Error changing password!";
+                    if (err && err.code === "auth/wrong-password") msg = "Current password galat hai!";
+                    else if (err && err.code === "auth/weak-password") msg = "New password bahut chhota hai (6+ characters)!";
+                    else if (err && err.code === "auth/requires-recent-login") msg = "Thodi der pehle login karo aur dobara try karo!";
+                    showToast(msg, true);
+                })
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.innerText = "CHANGE PASSWORD";
+                });
+        }
+        window.changeAdminPassword = changeAdminPassword;
+
+        function switchSettingsTab(tab) {
+            document.querySelectorAll(".settings-card").forEach(function(c) {
+                c.style.display = (c.dataset.sec === tab) ? "" : "none";
+            });
+            document.querySelectorAll(".nav-sub-item").forEach(function(i) {
+                i.classList.toggle("active", i.dataset.sub === tab);
+            });
+            document.querySelectorAll(".sub-tab").forEach(function(i) {
+                i.classList.toggle("active", i.dataset.tab === tab);
+            });
+            var titles = { general: "Settings", theme: "UI Management", password: "Password Change" };
+            var titleEl = document.getElementById("pageTitle");
+            if (titleEl) titleEl.innerText = titles[tab] || "Settings";
+            history.replaceState({}, "", "settings.html?tab=" + tab);
+        }
+        window.switchSettingsTab = switchSettingsTab;
+
+        (function initSettingsTab() {
+            var params = new URLSearchParams(window.location.search);
+            var tab = params.get("tab");
+            if (!tab || ["general", "theme", "password"].indexOf(tab) === -1) tab = "general";
+            switchSettingsTab(tab);
+        })();
 
         function saveMaintenance() {
             const data = {
